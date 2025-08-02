@@ -1,7 +1,10 @@
+
 import React, { useState, useEffect } from "react";
 import Header from "./Component/LayoutComponent/Header";
 import Footer from "./Component/LayoutComponent/Footer";
 import AppRoutes from "./Routes/Route";
+
+
 
 function App() {
   const [loading, setLoading] = useState(true);
