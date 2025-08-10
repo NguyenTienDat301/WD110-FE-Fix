@@ -44,11 +44,11 @@ const AboutComponent: React.FC = () => {
               <p />
               <p>
                 <strong>
-                  Là một tín đồ của môn thể thao vua, chúng ta hiểu rằng niềm
-                  đam mê không chỉ dừng lại sau 90 phút trên sân. Cảm giác được
-                  khoác lên mình màu áo của đội bóng yêu thích, dù là khi ra sân
-                  thi đấu hay khi hòa mình vào một trận cầu đỉnh cao trên TV, là
-                  một trải nghiệm đầy tự hào.
+                  Là một tín đồ của môn thể thao, chúng ta hiểu rằng niềm đam mê
+                  không chỉ dừng lại sau 90 phút trên sân. Cảm giác được khoác
+                  lên mình màu áo của đội bóng yêu thích, dù là khi ra sân thi
+                  đấu hay khi hòa mình vào một trận cầu đỉnh cao trên TV, là một
+                  trải nghiệm đầy tự hào.
                 </strong>
               </p>
               <p>
