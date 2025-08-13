@@ -114,14 +114,22 @@ const ProductDetailComponent: React.FC = () => {
     if (product && selectedSize && selectedColor) {
       const variant = product.variants?.find(
         (v: any) =>
-          v.size_id === selectedSize &&
-          v.color_id === selectedColor
+          v.size_id === selectedSize && v.color_id === selectedColor
       );
       setSelectedVariant(variant || null);
     } else {
       setSelectedVariant(null);
     }
   }, [product, selectedSize, selectedColor]);
+
+  // Hàm kiểm tra xem một biến thể có còn hàng không
+  const isVariantAvailable = (colorId: string, sizeId: string) => {
+    if (!product) return false;
+    const variant = product.variants?.find(
+      (v: any) => v.color_id === colorId && v.size_id === sizeId
+    );
+    return variant && variant.quantity > 0;
+  };
 
   console.log("chi tiết sản phẩm", productById);
 
@@ -289,32 +297,41 @@ const ProductDetailComponent: React.FC = () => {
                       {product.colors.find((c: any) => c.id === selectedColor)?.name_color || "Chọn Màu"}
                     </label>
                     <ul className="list-color-detail">
-                      {product.colors.map((color: any) => (
-                        <button
-                          className="button-color"
-                          key={color.id}
-                          style={{
-                            fontFamily: "Raleway",
-                            padding: "10px 15px",
-                            border:
-                              selectedColor === color.id
-                                ? "1px solid rgb(159,137,219)"
-                                : "1px solid gray",
-                            borderRadius: "8px",
-                            backgroundColor: "white",
-                            // background: selectedColor === color.name_color ? 'rgb(159,137,219)' : 'none',
-                            margin: "0 5px 0 0",
-                            color:
-                              selectedColor === color.id
-                                ? "rgb(159,137,219)"
-                                : "black",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => setSelectedColor(color.id)}
-                        >
-                          {color.name_color}
-                        </button>
-                      ))}
+                      {product.colors.map((color: any) => {
+                        const isAvailable = product.sizes.some((size: any) => isVariantAvailable(color.id, size.id));
+                        return (
+                          <button
+                            className={`button-color ${
+                              !isAvailable ? "disabled" : ""
+                            }`}
+                            key={color.id}
+                            style={{
+                              fontFamily: "Raleway",
+                              padding: "10px 15px",
+                              border:
+                                selectedColor === color.id
+                                  ? "1px solid rgb(159,137,219)"
+                                  : "1px solid gray",
+                              borderRadius: "8px",
+                              backgroundColor: !isAvailable
+                                ? "#f0f0f0"
+                                : "white",
+                              margin: "0 5px 0 0",
+                              color:
+                                selectedColor === color.id
+                                  ? "rgb(159,137,219)"
+                                  : !isAvailable
+                                  ? "#ccc"
+                                  : "black",
+                              cursor: !isAvailable ? "not-allowed" : "pointer",
+                            }}
+                            onClick={() => isAvailable && setSelectedColor(color.id)}
+                            disabled={!isAvailable}
+                          >
+                            {color.name_color}
+                          </button>
+                        );
+                      })}
                     </ul>
                   </div>
                   <div className="block-size">
@@ -323,30 +340,44 @@ const ProductDetailComponent: React.FC = () => {
                       {product.sizes.find((s: any) => s.id === selectedSize)?.size || "Chọn Size"}
                     </label>
                     <div className="list-sizes-detail">
-                      {product.sizes.map((size: any) => (
-                        <button
-                          className="button-size"
-                          key={size.id}
-                          style={{
-                            padding: "10px 15px",
-                            border:
-                              selectedSize === size.id
-                                ? "1px solid rgb(159,137,219)"
-                                : "1px solid gray",
-                            borderRadius: "8px",
-                            backgroundColor: "white",
-                            color:
-                              selectedSize === size.id
-                                ? "rgb(159,137,219)"
-                                : "black",
-                            margin: "0 5px 0 0",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => setSelectedSize(size.id)}
-                        >
-                          {size.size}
-                        </button>
-                      ))}
+                      {product.sizes.map((size: any) => {
+                        const isAvailable = selectedColor
+                          ? isVariantAvailable(selectedColor, size.id)
+                          : product.colors.some((color: any) =>
+                              isVariantAvailable(color.id, size.id)
+                            );
+                        return (
+                          <button
+                            className={`button-size ${
+                              !isAvailable ? "disabled" : ""
+                            }`}
+                            key={size.id}
+                            style={{
+                              padding: "10px 15px",
+                              border:
+                                selectedSize === size.id
+                                  ? "1px solid rgb(159,137,219)"
+                                  : "1px solid gray",
+                              borderRadius: "8px",
+                              backgroundColor: !isAvailable
+                                ? "#f0f0f0"
+                                : "white",
+                              color:
+                                selectedSize === size.id
+                                  ? "rgb(159,137,219)"
+                                  : !isAvailable
+                                  ? "#ccc"
+                                  : "black",
+                              margin: "0 5px 0 0",
+                              cursor: !isAvailable ? "not-allowed" : "pointer",
+                            }}
+                            onClick={() => isAvailable && setSelectedSize(size.id)}
+                            disabled={!isAvailable}
+                          >
+                            {size.size}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                   {/* Số lượng tồn kho */}
