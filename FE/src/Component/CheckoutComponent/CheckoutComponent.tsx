@@ -1,10 +1,3 @@
-import React from "react";
-
-const CheckoutComponent = () => {
-  return <div></div>;
-};
-
-export default CheckoutComponent;
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { notification, Modal, message } from "antd";
