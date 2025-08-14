@@ -232,16 +232,16 @@ li.hr span {
 
 /*--- Common Classes---------------------*/
 ::-moz-selection {
-  background: #069; /* WebKit/Blink Browsers */
+  background: #198754; /* Xanh lá bóng đá */
   color: #fff;
 }
 ::selection {
-  background: #069; /* WebKit/Blink Browsers */
+  background: #198754; /* Xanh lá bóng đá */
   color: #fff;
 }
 
 ::-moz-selection {
-  background: #069; /* Gecko Browsers */
+  background: #198754; /* Xanh lá bóng đá */
   color: #fff;
 }
 
@@ -251,13 +251,13 @@ li.hr span {
 }
 
 ::placeholder {
-  color: #122830;
+  color: #FFC107; /* Vàng bóng đá */
   opacity: 1;
 }
 
 :-ms-input-placeholder,
 ::-webkit-input-placeholder {
-  color: #122830;
+  color: #FFC107; /* Vàng bóng đá */
   opacity: 1;
 }
 
@@ -7994,7 +7994,7 @@ h4.brush-bg::after {
 .block-shop-head {
   padding: 90px 0px 105px 0px;
   background-color: #EDE7E9;
-  background-image: url(../imgs/page/shop/bg-head.png);
+  background-image: url(../imgs/page/shop/quan-ao-bong-da-quan-ao-the-thao-onebetter-banner.jpg);
   background-position: right center;
   background-size: contain;
   background-repeat: no-repeat;
