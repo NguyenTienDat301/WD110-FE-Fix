@@ -431,20 +431,6 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
               className="row"
               style={{ display: "flex", justifyContent: "end" }}
             >
-              {/* <div className="col-lg-5 mb-30">
-                <div className="box-form-discount">
-                  <div className="box-form-discount-inner">
-                    <input
-                      className="form-control"
-                      type="text"
-                      placeholder="Mã giảm giá"
-                      value={voucherCode}
-                      onChange={handleVoucherInputChange}
-                    />
-                   
-                  </div>
-                </div>
-              </div> */}
               {/* Phần tính tổng tiền giỏ hàng */}
               {isCart.length > 0 && (
                 <div className="col-lg-4 mb-30">
