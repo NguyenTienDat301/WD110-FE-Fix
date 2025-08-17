@@ -612,13 +612,7 @@ const CheckoutComponent: React.FC = () => {
                         </div>
                         <div className="item-checkout justify-content-between">
                           <span className="font-sm">Phí ship</span>
-                          <span className="font-md-bold">
-                            {/* {(30000).toLocaleString("vi-VN", {
-                              style: "currency",
-                              currency: "VND",
-                            })} */}
-                            Free
-                          </span>
+                          <span className="font-md-bold">Free</span>
                         </div>
                         {isVoucher?.length > 0 && (
                           <div className="item-checkout justify-content-between">
