@@ -428,29 +428,7 @@ const CheckoutComponent: React.FC = () => {
                         />
                       </div>
                     </div>
-                    {/* <div className="col-lg-6" style={{ width: "100%" }}>
-                      <div className="form-group">
-                        <label
-                          htmlFor=""
-                          style={{
-                            fontFamily: "Raleway",
-                            fontSize: "17px",
-                            fontWeight: "600",
-                            marginBottom: "10px",
-                          }}
-                        >
-                          *Email
-                        </label>
-                        <input
-                          className="form-control name-pla"
-                          type="email"
-                          placeholder="*Nhập thông tin email"
-                          name="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                        />
-                      </div>
-                    </div> */}
+
                     <div className="col-lg-6" style={{ width: "100%" }}>
                       <div className="form-group name-pla">
                         <label
