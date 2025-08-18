@@ -27,6 +27,7 @@ class AdminController extends Controller
             'results' => $results
         ]);
     }
+
     public function admin(Request $request)
 {
     // Tính tổng số user
@@ -44,7 +45,7 @@ class AdminController extends Controller
     return view('admin.dashboard', compact('totalUsers', 'completedOrders', 'totalRevenue', 'pendingOrders'));
 }
 
-public function edit()
+    public function edit()
     {
         $user = Auth::user();
 
@@ -87,7 +88,7 @@ public function edit()
         return redirect()->back()->with('success', 'Thông tin tài khoản đã được cập nhật thành công.');
     }
 
-public function changepass()
+    public function changepass()
     {
         return view('admin.changepass');
     }
