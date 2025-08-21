@@ -16,7 +16,24 @@ class OrderStatusController extends Controller
     public function updateStatus(Request $request, $orderId)
     {
         try {
-        
+            $request->validate([
+                'status' => 'required|integer|min:0|max:5',
+                'message' => 'nullable|string|max:255'
+            ]);
+
+            $order = Order::findOrFail($orderId);
+            $oldStatus = $order->status;
+            $newStatus = $request->input('status');
+
+            // Validate status transition
+            $allowedTransitions = [
+                0 => [1, 4], // Chờ xử lý -> Đã xử lý hoặc Hủy
+                1 => [2, 4], // Đã xử lý -> Đang vận chuyển hoặc Hủy
+                2 => [3, 4], // Đang vận chuyển -> Giao hàng thành công hoặc Hủy
+                3 => [5],    // Giao hàng thành công -> Đã trả lại
+                4 => [],     // Đã hủy -> Không thể chuyển
+                5 => []      // Đã trả lại -> Không thể chuyển
+            ];
 
             if (!in_array($newStatus, $allowedTransitions[$oldStatus])) {
                 return response()->json([
@@ -47,7 +64,12 @@ class OrderStatusController extends Controller
             ]);
 
         } catch (\Exception $e) {
-           
+            Log::error('Error updating order status: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Có lỗi xảy ra khi cập nhật trạng thái'
+            ], 500);
+        }
     }
 
     /**
@@ -58,10 +80,22 @@ class OrderStatusController extends Controller
         try {
             $order = Order::findOrFail($orderId);
             
-           
-            
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'order_id' => $order->id,
+                    'status' => $order->status,
+                    'status_text' => $this->getStatusText($order->status),
+                    'message' => $order->message,
+                    'updated_at' => $order->updated_at
+                ]
+            ]);
         } catch (\Exception $e) {
-           
+            return response()->json([
+                'success' => false,
+                'message' => 'Không tìm thấy đơn hàng'
+            ], 404);
+        }
     }
 
     /**
@@ -69,7 +103,14 @@ class OrderStatusController extends Controller
      */
     private function getStatusText($status): string
     {
-        
+        $statusMap = [
+            0 => 'Chờ xử lý',
+            1 => 'Đã xử lý',
+            2 => 'Đang vận chuyển',
+            3 => 'Giao hàng thành công',
+            4 => 'Đã hủy',
+            5 => 'Đã trả lại'
+        ];
 
         return $statusMap[$status] ?? 'Không xác định';
     }
