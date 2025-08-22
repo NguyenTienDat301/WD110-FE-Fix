@@ -50,9 +50,10 @@ const ContactForm: React.FC = () => {
                   Bạn đang cần hỗ trợ hoặc trò chuyện với bộ phận bán hàng?
                 </h4>
                 <p className="font-md mb-40">
-                  Nếu bạn cần hỗ trợ về thẻ 110Store hiện có, vui lòng gửi email
-                  tới: 110Store@gmail.com Để nói chuyện với ai đó trong nhóm bán
-                  hàng của chúng tôi, vui lòng nói chuyện với chuyên gia
+                  Nếu bạn cần hỗ trợ về thẻ 110 Store hiện có, vui lòng gửi
+                  email tới: 110Store@gmail.com Để nói chuyện với ai đó trong
+                  nhóm bán hàng của chúng tôi, vui lòng nói chuyện với chuyên
+                  gia
                 </p>
 
                 <p className="font-md">
