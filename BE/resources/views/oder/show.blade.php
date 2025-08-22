@@ -113,6 +113,7 @@
             @if ($order->shipAddress)
                 <div class="border p-3 mb-3 bg-light" style="font-size: 16px;">
                     <p><strong>Tên người nhận:</strong> {{ $order->shipAddress->recipient_name ?? 'Chưa cập nhật' }}</p>
+                    <p><strong>Tên người gửi:</strong> {{ $order->shipAddress->sender_name ?? ($order->sender_name ?? 'Chưa cập nhật') }}</p>
                     <p><strong>Số điện thoại:</strong> {{ $order->shipAddress->phone_number ?? 'Chưa cập nhật' }}</p>
                     <p><strong>Địa chỉ giao hàng:</strong>
                         @if ($order->shipAddress->ship_address)
