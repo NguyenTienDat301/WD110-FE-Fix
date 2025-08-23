@@ -27,24 +27,78 @@ class AdminController extends Controller
             'results' => $results
         ]);
     }
+
     public function admin(Request $request)
-{
-    // Tính tổng số user
-    $totalUsers = User::where('role', 0)->count();
+    {
+        // Lấy tham số thời gian từ request
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        
+        // Nếu không có ngày cụ thể, sử dụng tháng hiện tại
+        if (!$startDate || !$endDate) {
+            $startDate = Carbon::now()->startOfMonth();
+            $endDate = Carbon::now()->endOfMonth();
+        } else {
+            // Chuyển đổi string thành Carbon object
+            $startDate = Carbon::parse($startDate)->startOfDay();
+            $endDate = Carbon::parse($endDate)->endOfDay();
+        }
 
-    // Tính tổng đơn hàng đã hoàn thành (status = 3 là hoàn thành)
-    $completedOrders = Order::where('status', 3)->count();
+        // Tính tổng số user (tất cả thời gian)
+        $totalUsers = User::where('role', 0)->count();
 
-    // Tính tổng đơn hàng chưa xử lý (status = 1 là chưa xử lý)
-    $pendingOrders = Order::where('status', 0)->count();
+        // Tính tổng đơn hàng đã hoàn thành theo khoảng thời gian
+        $completedOrdersQuery = Order::where('status', 3);
+        if ($startDate && $endDate) {
+            $completedOrdersQuery->whereBetween('created_at', [$startDate, $endDate]);
+        }
+        $completedOrders = $completedOrdersQuery->count();
 
-    // Tính tổng doanh thu
-    $totalRevenue = Order::where('status', 3)->sum('total_amount');
+        // Tính tổng đơn hàng chưa xử lý (tất cả thời gian)
+        $pendingOrders = Order::where('status', 0)->count();
 
-    return view('admin.dashboard', compact('totalUsers', 'completedOrders', 'totalRevenue', 'pendingOrders'));
-}
+        // Tính tổng doanh thu theo khoảng thời gian
+        $totalRevenueQuery = Order::where('status', 3);
+        if ($startDate && $endDate) {
+            $totalRevenueQuery->whereBetween('created_at', [$startDate, $endDate]);
+        }
+        $totalRevenue = $totalRevenueQuery->sum('total_amount');
 
-public function edit()
+        // Tính dữ liệu so sánh với khoảng thời gian trước đó (cùng độ dài)
+        $periodLength = $startDate->diffInDays($endDate);
+        $previousStartDate = $startDate->copy()->subDays($periodLength + 1);
+        $previousEndDate = $startDate->copy()->subDay();
+        
+        $previousRevenue = Order::where('status', 3)
+            ->whereBetween('created_at', [$previousStartDate, $previousEndDate])
+            ->sum('total_amount');
+        $previousOrders = Order::where('status', 3)
+            ->whereBetween('created_at', [$previousStartDate, $previousEndDate])
+            ->count();
+
+        // Tính phần trăm thay đổi
+        $revenueChange = $previousRevenue > 0 ? (($totalRevenue - $previousRevenue) / $previousRevenue) * 100 : ($totalRevenue > 0 ? 100 : 0);
+        $ordersChange = $previousOrders > 0 ? (($completedOrders - $previousOrders) / $previousOrders) * 100 : ($completedOrders > 0 ? 100 : 0);
+
+        // Format ngày để hiển thị
+        $formattedStartDate = $startDate->format('d/m/Y');
+        $formattedEndDate = $endDate->format('d/m/Y');
+
+        return view('admin.dashboard', compact(
+            'totalUsers', 
+            'completedOrders', 
+            'totalRevenue', 
+            'pendingOrders',
+            'revenueChange',
+            'ordersChange',
+            'formattedStartDate',
+            'formattedEndDate',
+            'startDate',
+            'endDate'
+        ));
+    }
+
+    public function edit()
     {
         $user = Auth::user();
 
@@ -87,7 +141,7 @@ public function edit()
         return redirect()->back()->with('success', 'Thông tin tài khoản đã được cập nhật thành công.');
     }
 
-public function changepass()
+    public function changepass()
     {
         return view('admin.changepass');
     }
