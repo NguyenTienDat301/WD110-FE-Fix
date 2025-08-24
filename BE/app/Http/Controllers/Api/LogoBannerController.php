@@ -11,11 +11,26 @@ class LogoBannerController extends Controller
     public function index()
     {
         try {
-            $groupedData = LogoBanner::all()
-                ->groupBy('type')
-                ->map(fn($items) => $items->map(fn($logo) => $this->formatLogoBanner($logo)));
+            // Lấy tất cả logo banners và phân chia theo type (logo và banner)
+            $logoBanners = LogoBanner::all();
 
-            return response()->json($groupedData);
+            // Chia dữ liệu theo type (logo hoặc banner)
+            $groupedData = $logoBanners->groupBy('type')->map(function ($item) {
+                return $item->map(function ($logoBanner) {
+                    return [
+                        'id' => $logoBanner->id,
+                        'type' => $logoBanner->type,
+                        'title' => $logoBanner->title,
+                        'description' => $logoBanner->description,
+                        'image' => $logoBanner->image ? asset('storage/' . $logoBanner->image) : null, // Đường dẫn đầy đủ của ảnh
+                        'is_active' => $logoBanner->is_active,
+                        'created_at' => $logoBanner->created_at,
+                        'updated_at' => $logoBanner->updated_at,
+                    ];
+                });
+            });
+
+            return response()->json($groupedData, 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Có lỗi xảy ra: ' . $e->getMessage()], 500);
         }
@@ -24,25 +39,26 @@ class LogoBannerController extends Controller
     public function show($id)
     {
         try {
-            return response()->json($this->formatLogoBanner(LogoBanner::findOrFail($id)));
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+            // Lấy logo banner theo ID
+            $logoBanner = LogoBanner::findOrFail($id);
+
+            // Trả về thông tin chi tiết của logo banner
+            $logoBannerDetails = [
+                'id' => $logoBanner->id,
+                'type' => $logoBanner->type,
+                'title' => $logoBanner->title,
+                'description' => $logoBanner->description,
+                'image' => $logoBanner->image ? asset('storage/' . $logoBanner->image) : null, // Đường dẫn đầy đủ
+                'is_active' => $logoBanner->is_active,
+                'created_at' => $logoBanner->created_at,
+                'updated_at' => $logoBanner->updated_at,
+            ];
+
+            return response()->json($logoBannerDetails, 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'Logo/Banner không tồn tại'], 404);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Có lỗi xảy ra: ' . $e->getMessage()], 500);
         }
-    }
-
-    private function formatLogoBanner($logoBanner)
-    {
-        return [
-            'id' => $logoBanner->id,
-            'type' => $logoBanner->type,
-            'title' => $logoBanner->title,
-            'description' => $logoBanner->description,
-            'image' => $logoBanner->image ? asset('storage/' . $logoBanner->image) : null,
-            'is_active' => $logoBanner->is_active,
-            'created_at' => $logoBanner->created_at,
-            'updated_at' => $logoBanner->updated_at,
-        ];
     }
 }
