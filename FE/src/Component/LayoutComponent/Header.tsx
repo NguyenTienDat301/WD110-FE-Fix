@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import Logo from "../../assets/imgs/template/logo.svg";
+import Logo from "../../assets/imgs/template/110.jpg";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../Redux/store";
@@ -160,17 +160,17 @@ const Header: React.FC = () => {
     const GetLogo = async () => {
       try {
         const { data } = await axios.get(
-          `http://127.0.0.1:8000/api/logobanner/${1}`
+          `http://127.0.0.1:8000/api/logobanner/${5}`
         );
         setLogo(data.image);
       } catch (error) {
-        message.error("Lỗi api!");
+        // Xử lý lỗi 404 - sử dụng logo mặc định
+        console.error("Không thể tải logo:", error);
+        setLogo(Logo); // Sử dụng logo mặc định
       }
     };
     GetLogo();
   }, []);
-
-  console.log("Logooooo", isLogo);
 
   useEffect(() => {
     const userLocal = localStorage.getItem("user");
@@ -182,7 +182,6 @@ const Header: React.FC = () => {
     }
   }, []);
 
-  console.log("user locallll", isToken);
 
   const handleClick = () => {
     setIsShow(true);
@@ -198,7 +197,6 @@ const Header: React.FC = () => {
     }
   };
 
-  console.log(totalQuantity, "sollllll");
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -217,8 +215,6 @@ const Header: React.FC = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
     if (!password.trim() || !email.trim()) {
       notification.error({
         message: "Vui lòng nhập đầy đủ thông tin",
@@ -234,7 +230,6 @@ const Header: React.FC = () => {
         localStorage.setItem("token", userData.token);
         window.location.reload();
 
-        console.log(resultAction, 'chhhhhh');
         
       } else {
         notification.error({
@@ -253,9 +248,13 @@ const Header: React.FC = () => {
 
 
   const navDashBoard = () => {
-    if (isToken) {
+    if (isToken && userLocala) {
       const tokenNew = isToken.includes("|") ? isToken.split("|")[1] : isToken;
-      window.location.href = `http://localhost:8000/user/dashboard?token=${tokenNew}`;
+      if (userLocala.role === 1) {
+        window.location.href = `http://localhost:8000/admin/dashboard?token=${tokenNew}`;
+      } else {
+        window.location.href = `http://localhost:8000/user/dashboard?token=${tokenNew}`;
+      }
     }
   };
 
