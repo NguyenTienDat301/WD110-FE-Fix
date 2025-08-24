@@ -71,7 +71,7 @@ const OrderHistoryComponent: React.FC = () => {
       render: (record: any) => (
         <ul>
           {record.orderDetails.map((detail: any) => (
-            <li key={detail.productId}>{detail.productName}</li>
+            <li key={detail.product_variant_id}>{detail.productName} ({detail.size_name})</li>
           ))}
         </ul>
       ),
@@ -82,8 +82,8 @@ const OrderHistoryComponent: React.FC = () => {
       render: (record: any) => (
         <ul>
           {record.orderDetails.map((detail: any) => (
-            <li key={detail.productId}>
-              {detail.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
+            <li key={detail.product_variant_id}>
+              {detail.price_sale.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}
             </li>
           ))}
         </ul>
