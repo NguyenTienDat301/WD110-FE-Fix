@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Throwable;
+
 class ManagerUserController extends Controller
 {
     public function index(Request $request)
@@ -25,6 +26,7 @@ class ManagerUserController extends Controller
             $query->where('is_active', 1); // Bình thường
         }
     }
+
     // Lấy dữ liệu với phân trang
     $data = $query->latest()->paginate(5);
 
