@@ -7,7 +7,7 @@
 @section('content_admin')
     <!-- CSRF Token for AJAX requests -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     <!-- Include realtime CSS and JavaScript -->
     <link rel="stylesheet" href="{{ asset('css/realtime-orders.css') }}">
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
@@ -25,7 +25,7 @@
     @endif
 
     <h1 class="text-center mt-5 mb-3">Danh sách đơn hàng</h1>
-    
+
     <!-- Thông báo hướng dẫn -->
     <div class="alert alert-info mx-3 mb-3">
         <h6 class="alert-heading"><i class="fas fa-info-circle"></i> Hướng dẫn cập nhật trạng thái đơn hàng:</h6>
@@ -36,20 +36,36 @@
             <li><strong>Trả lại:</strong> Chỉ có thể trả lại sau khi giao hàng thành công</li>
         </ul>
     </div>
-    
+
     <div class="d-flex justify-content-between px-3">
 
-        <form action="{{ route('orders.index') }}" method="GET" class="mb-3">
-            <select name="status" class="form-select" onchange="this.form.submit()">
-                <option value="">Tất cả trạng thái</option>
-                <option value="0" {{ request('status') == 0 ? 'selected' : '' }}>Chờ xử lý</option>
-                <option value="1" {{ request('status') == 1 ? 'selected' : '' }}>Đã xử lý</option>
-                <option value="2" {{ request('status') == 2 ? 'selected' : '' }}>Đang vận chuyển</option>
-                <option value="3" {{ request('status') == 3 ? 'selected' : '' }}>Giao hàng thành công</option>
-                <option value="4" {{ request('status') == 4 ? 'selected' : '' }}>Đã hủy</option>
-                <option value="5" {{ request('status') == 5 ? 'selected' : '' }}>Đã trả lại</option>
-            </select>
-        </form>
+            <!-- Bộ lọc nâng cao -->
+            <form action="{{ route('orders.index') }}" method="GET" class="row g-2 align-items-center mb-3" style="width:100%">
+                <div class="col-md-3">
+                    <input type="text" name="keyword" class="form-control" placeholder="Mã đơn / Tên / Email / SĐT" value="{{ request('keyword') }}">
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select">
+                        <option value="">Tất cả trạng thái đơn</option>
+                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Chờ xử lý</option>
+                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Đã xử lý</option>
+                        <option value="2" {{ request('status') == '2' ? 'selected' : '' }}>Đang vận chuyển</option>
+                        <option value="3" {{ request('status') == '3' ? 'selected' : '' }}>Giao hàng thành công</option>
+                        <option value="4" {{ request('status') == '4' ? 'selected' : '' }}>Đã hủy</option>
+                        <option value="5" {{ request('status') == '5' ? 'selected' : '' }}>Đã trả lại</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="payment_status" class="form-select">
+                        <option value="">Tất cả thanh toán</option>
+                        <option value="paid" {{ request('payment_status') == 'paid' ? 'selected' : '' }}>Đã thanh toán</option>
+                        <option value="unpaid" {{ request('payment_status') == 'unpaid' ? 'selected' : '' }}>Chưa thanh toán</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Lọc kết quả</button>
+                </div>
+            </form>
 
     </div>
     <div class="container mt-2">
@@ -58,14 +74,15 @@
             <table class="table table-striped table-bordered text-center">
                 <thead class="thead-dark">
                     <tr>
-                        <th>Mã Đơn hàng</th>
-                        <th>Người dùng</th>
-                        <th>Địa chỉ giao hàng</th>
-                        <th>Số lượng</th>
-                        <th>Tổng tiền</th>
-                        <th>Trạng thái</th>
-                        <th>Ghi chú</th>
-                        <th>Thao tác</th>
+                            <th style="min-width: 120px;">Mã Đơn hàng</th>
+                            <th style="min-width: 160px;">Người dùng</th>
+                            <th style="min-width: 180px;">Địa chỉ giao hàng</th>
+                            <th style="min-width: 80px;">Số lượng</th>
+                            <th style="min-width: 130px;">Tổng tiền</th>
+                            <th style="min-width: 150px;">Trạng thái</th>
+                            <th style="min-width: 180px;">Ghi chú</th>
+                            <th style="min-width: 110px;">Thao tác</th>
+
                     </tr>
                 </thead>
                 <tbody>
@@ -108,17 +125,17 @@
                                             {{ !in_array(4, \App\Helpers\OrderHelper::getNextAllowedStatuses($order->status)) ? 'disabled' : '' }}>
                                             Đã hủy
                                         </option>
-                                        <option value="5" {{ $order->status == 5 ? 'selected' : '' }}
+                                        {{-- <option value="5" {{ $order->status == 5 ? 'selected' : '' }}
                                             {{ !in_array(5, \App\Helpers\OrderHelper::getNextAllowedStatuses($order->status)) ? 'disabled' : '' }}>
                                             Đã trả lại
-                                        </option>
+                                        </option> --}}
                                     </select>
                                 </form>
 
                                 <script>
                                     function confirmAndSubmit(selectElement, currentStatus) {
                                         const selectedStatus = parseInt(selectElement.value);
-                                        
+
                                         // Định nghĩa quy tắc chuyển đổi trạng thái
                                         const allowedTransitions = {
                                             0: [1, 4], // Chờ xử lý -> Đã xử lý hoặc Hủy
@@ -126,43 +143,43 @@
                                             2: [3, 4], // Đang vận chuyển -> Giao hàng thành công hoặc Hủy
                                             3: [5],    // Giao hàng thành công -> Đã trả lại
                                             4: [],     // Đã hủy -> Không thể chuyển
-                                            5: []      // Đã trả lại -> Không thể chuyển
+                                            // 5: []      // Đã trả lại -> Không thể chuyển
                                         };
-                                        
+
                                         // Kiểm tra xem có được phép chuyển không
                                         if (!allowedTransitions[currentStatus].includes(selectedStatus)) {
                                             const statusNames = {
                                                 0: 'Chờ xử lý',
-                                                1: 'Đã xử lý', 
+                                                1: 'Đã xử lý',
                                                 2: 'Đang vận chuyển',
                                                 3: 'Giao hàng thành công',
                                                 4: 'Đã hủy',
-                                                5: 'Đã trả lại'
+                                                // 5: 'Đã trả lại'
                                             };
-                                            
+
                                             const currentStatusName = statusNames[currentStatus] || 'Không xác định';
                                             const newStatusName = statusNames[selectedStatus] || 'Không xác định';
-                                            
+
                                             alert(`Không thể chuyển từ trạng thái '${currentStatusName}' sang '${newStatusName}'.\n\nQuy tắc cập nhật:\n• Chỉ có thể cập nhật từng bước một\n• Quy trình: Chờ xử lý → Đã xử lý → Đang vận chuyển → Giao hàng thành công\n• Có thể hủy đơn ở bất kỳ bước nào trước khi giao hàng thành công`);
-                                            
+
                                             // Đặt lại giá trị về trạng thái hiện tại
                                             selectElement.value = currentStatus;
                                             return;
                                         }
-                                        
+
                                         // Xác nhận trước khi cập nhật
                                         const statusNames = {
                                             0: 'Chờ xử lý',
-                                            1: 'Đã xử lý', 
+                                            1: 'Đã xử lý',
                                             2: 'Đang vận chuyển',
                                             3: 'Giao hàng thành công',
                                             4: 'Đã hủy',
-                                            5: 'Đã trả lại'
+                                            // 5: 'Đã trả lại'
                                         };
-                                        
+
                                         const currentStatusName = statusNames[currentStatus] || 'Không xác định';
                                         const newStatusName = statusNames[selectedStatus] || 'Không xác định';
-                                        
+
                                         if (confirm(`Xác nhận cập nhật trạng thái đơn hàng từ '${currentStatusName}' sang '${newStatusName}'?`)) {
                                             selectElement.form.submit();
                                         } else {
@@ -178,6 +195,9 @@
                             <td>
                                 <a href="{{ route('orders.show', $order->id) }}" class="btn btn-info btn-sm">Chi tiết</a>
                             </td>
+                               {{-- <td>
+                                   <a href="{{ route('orders.show', $order->id) }}" class="btn btn-primary btn-sm">Xem chi tiết</a>
+                               </td> --}}
                         </tr>
                     @endforeach
                 </tbody>
@@ -190,6 +210,13 @@
     </div>
 
     <style>
+            /* Đảm bảo bảng luôn hiển thị đầy đủ các cột, không bị ẩn */
+            .table-responsive {
+                overflow-x: auto;
+            }
+            table.table {
+                min-width: 1200px;
+            }
         /* Chỉnh sửa màu sắc các option để chúng luôn dễ nhìn */
         select.form-select {
             font-weight: bold;
