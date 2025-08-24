@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LogoBanner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+
 class LogoBannerController extends Controller
 {
     public function index()
@@ -17,6 +18,7 @@ class LogoBannerController extends Controller
     {
         return view('logo_banners.create');
     }
+
     public function store(Request $request)
     {
         // Kiểm tra xem trong bảng LogoBanner đã có đủ 3 bản ghi chưa
@@ -43,7 +45,9 @@ class LogoBannerController extends Controller
 
         return redirect()->route('logo_banners.index')->with('success', 'Thao tác thành công ');
     }
-public function edit($id)
+
+
+    public function edit($id)
     {
         $logoBanner = LogoBanner::findOrFail($id);
         return view('logo_banners.edit', compact('logoBanner'));
@@ -81,6 +85,24 @@ public function edit($id)
         } catch (\Exception $e) {
             // Nếu có lỗi, trả về thông báo lỗi
             return back()->with('error', 'Có lỗi xảy ra khi cập nhật: ');
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $logoBanner = LogoBanner::findOrFail($id);
+
+            // Xóa hình ảnh khỏi storage nếu có
+            if ($logoBanner->image) {
+                Storage::delete('public/' . $logoBanner->image);
+            }
+
+            $logoBanner->delete();
+
+            return redirect()->route('logo_banners.index')->with('success', 'Xóa logo/banner thành công!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Có lỗi xảy ra khi xóa: ' . $e->getMessage());
         }
     }
 }

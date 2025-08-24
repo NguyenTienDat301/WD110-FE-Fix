@@ -456,4 +456,3 @@ class ThongkeController extends Controller
         return view('thongke.khachhang', compact('data'));
     }
 }
- 

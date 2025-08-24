@@ -29,6 +29,7 @@ class AddressController extends Controller
             'ship_address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:15',
             'recipient_name' => 'required|string|max:255',
+            'sender_name' => 'nullable|string|max:255',
             'is_default' => Rule::in([0, 1]),
         ]);
 
@@ -64,6 +65,7 @@ class AddressController extends Controller
         $address = Ship_address::findOrFail($id);
         $data = $request->validate([
             'recipient_name' => 'required|string|max:255',
+            'sender_name' => 'nullable|string|max:255',
             'ship_address' => 'required|string|max:255',
             'phone_number' => 'required|string|max:15',
         ]);

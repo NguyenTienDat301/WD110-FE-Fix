@@ -9,7 +9,11 @@ use Illuminate\Support\Facades\Storage;
 
 class ColorController extends Controller
 {
-     public function index()
+
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
         // Lấy tất cả màu sắc, kèm theo số lượng sản phẩm sử dụng mỗi màu
         $data = Color::latest('id')->paginate(5);
@@ -24,12 +28,19 @@ class ColorController extends Controller
         return view('bienthe.colors.index', compact('data'));
     }
 
-     public function create()
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
     {
         return view('bienthe.colors.create');
     }
 
-        public function store(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
     {
         $data = $request->validate([
             'name_color'      => 'required|max:25',
@@ -48,17 +59,26 @@ class ColorController extends Controller
         }
     }
 
-     public function show(Color $color)
+    /**
+     * Display the specified resource.
+     */
+    public function show(Color $color)
     {
         // return view('bienthe.colors.show', compact('color'));
     }
 
-     public function edit(Color $color)
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Color $color)
     {
         return view('bienthe.colors.edit', compact('color'));
     }
 
-public function update(Request $request, Color $color)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Color $color)
     {
         $data = $request->validate([
             'name_color'      => 'required|max:25',
@@ -73,7 +93,10 @@ public function update(Request $request, Color $color)
         }
     }
 
-     public function destroy(Color $color)
+
+    /**
+     * Remove the specified resource from storage.
+     */ public function destroy(Color $color)
     {
         try {
             // Kiểm tra xem có sản phẩm nào liên kết với màu sắc này không
