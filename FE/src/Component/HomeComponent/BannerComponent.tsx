@@ -2,8 +2,8 @@ import React from 'react';
 import api from '../../Axios/Axios';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
-import Banner from '../../assets/imgs/page/homepage1/banner.png';
-import BannerTwo from '../../assets/imgs/page/homepage1/banner2.png';
+import Banner from '../../assets/imgs/page/homepage1/MU.jpg';
+import BannerTwo from '../../assets/imgs/page/homepage1/e7cqmizxsaetkan-1511.jpg';
 import Sale from '../../assets/imgs/page/homepage1/sale.png';
 import Leaf from '../../assets/imgs/page/homepage1/leaf.png'
 import Star from '../../assets/imgs/page/homepage1/star.png'
@@ -26,7 +26,11 @@ const BannerComponent: React.FC = () => {
              setBannerTitle(data.title)
              setBannerDes2(data.description)
           } catch (error) {
-             console.log(error);
+             console.error("Lỗi khi tải banner 1:", error);
+             // Sử dụng banner mặc định nếu API fail
+             setBanner(Banner);
+             setBannerTitle("Khuyến mãi đặc biệt");
+             setBannerDes2("Giảm giá lên đến 50%");
           }
         };
         const GetLogo2 = async () => {
@@ -36,14 +40,17 @@ const BannerComponent: React.FC = () => {
                setBannerData(data.title)
                setBannerDes(data.description)
             } catch (error) {
-               console.log(error);
+               console.error("Lỗi khi tải banner 2:", error);
+               // Sử dụng banner mặc định nếu API fail
+               setBanner2(BannerTwo);
+               setBannerData("Sản phẩm mới");
+               setBannerDes("Bộ sưu tập mới nhất");
             }
           };
         GetLogo()
         GetLogo2()
       },[])
 
-      console.log("Banner", bannerData);
       
     
 
@@ -76,7 +83,7 @@ const BannerComponent: React.FC = () => {
                                             <span className="text-up">{bannerDes2}</span>
                                             <span className="text-under">{bannerDes2}</span>
                                         </h2>
-                                        <h4 className="heading-4 title-line-2 mb-30 wow animate__animated animate__zoomIn">Anything for your baby</h4>
+                                        <h4 className="heading-4 title-line-2 mb-30 wow animate__animated animate__zoomIn">Sport For You</h4>
                                         <div className="text-center mt-10">
                                             <a className="btn btn-double-border wow animate__animated animate__zoomIn" href="/product">
                                                 <span>Mua sắm ngay</span>
@@ -109,7 +116,7 @@ const BannerComponent: React.FC = () => {
                                         <span className="text-up">{bannerDes}</span>
                                         <span className="text-under">{bannerDes}</span>
                                         </h2>
-                                        <h4 className="heading-4 title-line-2 mb-30 wow animate__animated animate__zoomIn">Anything for your baby</h4>
+                                        <h4 className="heading-4 title-line-2 mb-30 wow animate__animated animate__zoomIn">Sport Is King</h4>
                                         <div className="text-center mt-10">
                                             <a className="btn btn-double-border wow animate__animated animate__zoomIn" href="/product">
                                                 <span>Mua sắm ngay</span>
