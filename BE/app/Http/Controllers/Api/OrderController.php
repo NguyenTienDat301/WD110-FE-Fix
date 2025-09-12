@@ -62,110 +62,115 @@ class OrderController extends Controller
             Log::info('OrderController@store: Tổng số lượng và tổng tiền', ['total_quantity' => $totalQuantity, 'total_amount' => $totalAmount]);
 
             // Kiểm tra voucher và tính toán giảm giá (nếu có)
-            $voucherId = $request->input('voucher_id');
+$voucherId = $request->input('voucher_id');
             $discountValue = 0;
-
+            $voucher = null;
             if ($voucherId) {
                 $voucher = Voucher::find($voucherId);
                 Log::info('OrderController@store: Voucher ID được cung cấp', ['voucher_id' => $voucherId]);
-
                 if ($voucher && $voucher->is_active == 1 && $voucher->quantity > 0) {
                     $currentDate = now();
-
                     // Kiểm tra nếu người dùng đã sử dụng voucher này
                     $voucherUsageExists = DB::table('voucher_usages')
                         ->where('user_id', auth()->id())
                         ->where('voucher_id', $voucherId)
                         ->exists();
-
                     if ($voucherUsageExists) {
                         Log::warning('OrderController@store: Người dùng đã sử dụng voucher này rồi.', ['user_id' => $userId, 'voucher_id' => $voucherId]);
                         return response()->json(['message' => 'Bạn đã sử dụng voucher này rồi.'], 400);
                     }
-
                     // Kiểm tra ngày bắt đầu và ngày kết thúc của voucher
                     if ($currentDate < $voucher->start_day || $currentDate > $voucher->end_day) {
                         Log::warning('OrderController@store: Voucher đã hết hạn hoặc chưa có hiệu lực.', ['voucher_id' => $voucherId, 'start_day' => $voucher->start_day, 'end_day' => $voucher->end_day]);
                         return response()->json(['message' => 'Phiếu giảm giá đã hết hạn hoặc chưa có hiệu lực.'], 400);
                     }
-
                     // Kiểm tra tổng tiền đơn hàng
                     if ($totalAmount <= $voucher->total_min) {
                         Log::warning('OrderController@store: Tổng tiền đơn hàng thấp hơn mức tối thiểu của voucher.', ['total_amount' => $totalAmount, 'min_amount' => $voucher->total_min]);
                         return response()->json(['message' => 'Tổng số tiền đặt hàng thấp hơn mức tối thiểu bắt buộc để được hưởng ưu đãi.'], 400);
                     }
-
                     if ($totalAmount >= $voucher->total_max) {
                         Log::warning('OrderController@store: Tổng tiền đơn hàng vượt quá mức tối đa của voucher.', ['total_amount' => $totalAmount, 'max_amount' => $voucher->total_max]);
                         return response()->json(['message' => 'Tổng số tiền đặt hàng vượt quá mức tối đa được phép hưởng ưu đãi.'], 400);
                     }
-
                     // Tính giá trị giảm giá và cập nhật số lượng voucher
                     $discountValue = min($voucher->discount_value, $totalAmount);
                     $voucher->increment('used_times');
                     $voucher->decrement('quantity');
                     Log::info('OrderController@store: Voucher được áp dụng.', ['voucher_id' => $voucherId, 'discount_value' => $discountValue]);
                 } else {
-                    Log::warning('OrderController@store: Voucher không hợp lệ hoặc không khả dụng.', ['voucher_id' => $voucherId]);
+Log::warning('OrderController@store: Voucher không hợp lệ hoặc không khả dụng.', ['voucher_id' => $voucherId]);
                     return response()->json(['message' => 'Phiếu mua hàng không hợp lệ'], 400);
                 }
             }
 
             $totalAmount -= $discountValue;
             Log::info('OrderController@store: Tổng tiền sau giảm giá', ['final_total_amount' => $totalAmount]);
-
-            // Tạo ID đơn hàng theo định dạng ngày tháng năm + số tăng dần
+            $maxRetry = 20;
+            $order = null;
+            $orderId = null;
             $today = now()->format('dmY');
-            $latestOrder = Order::where('id', 'LIKE', "$today%")->latest('id')->first();
-
-            $newIdSuffix = $latestOrder
-                ? (int)substr($latestOrder->id, -4) + 1
-                : 1;
-
-            $orderId = $today . str_pad($newIdSuffix, 4, '0', STR_PAD_LEFT);
-            Log::info('OrderController@store: Order ID được tạo', ['order_id' => $orderId]);
-
-            $order = Order::create([
-                'id' => $orderId, // Gán ID thủ công
-                'user_id' => $userId,
-                'quantity' => $totalQuantity,
-                'total_amount' => $totalAmount,
-                'payment_method' => $request->input('payment_method', 1),
-                'ship_method' => $request->input('ship_method', 1),
-                'voucher_id' => $voucherId,
-                'ship_address_id' => $shippingAddress->id,
-                'discount_value' => $discountValue,
-                'status' => 0, // Đang chờ xử lý
-            ]);
-            Log::info('OrderController@store: Đơn hàng được tạo thành công.', ['order_id' => $order->id]);
-
+            for ($try = 0; $try < $maxRetry; $try++) {
+                DB::beginTransaction();
+                try {
+                    $randomSuffix = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                    $orderId = $today . $randomSuffix;
+                    if (Order::where('id', $orderId)->exists()) {
+                        // Nếu trùng, thử lại
+                        DB::rollBack();
+                        usleep(100000);
+                        continue;
+                    }
+                    $order = Order::create([
+                        'id' => $orderId,
+                        'user_id' => $userId,
+                        'quantity' => $totalQuantity,
+                        'total_amount' => $totalAmount,
+                        'payment_method' => $request->input('payment_method', 1),
+                        'ship_method' => $request->input('ship_method', 1),
+                        'voucher_id' => $voucherId,
+                        'ship_address_id' => $shippingAddress->id,
+                        'discount_value' => $discountValue,
+                        'status' => 0,
+                    ]);
+                    DB::commit();
+                    break;
+                } catch (\Illuminate\Database\QueryException $e) {
+                    DB::rollBack();
+                    if ($e->getCode() == '23000') {
+                        usleep(100000); // Đợi 0.1s rồi thử lại
+                        continue;
+                    }
+                    throw $e;
+                }
+            }
+            if (!$order) {
+                return response()->json(['message' => 'Không thể tạo đơn hàng, vui lòng thử lại.'], 500);
+            }
+            // Xử lý chi tiết đơn hàng
             $orderDetails = [];
             foreach ($cartItems as $cartItem) {
                 $productVariant = $cartItem->productVariant;
                 $product = $productVariant->product;
-
                 $orderDetail = Order_detail::create([
                     'order_id' => $orderId,
                     'product_id' => $product->id,
                     'product_variant_id' => $productVariant->id,
                     'product_name' => $product->name,
                     'quantity' => $cartItem->quantity,
-                    'price' => $cartItem->price, // Ensure price is saved
-                    'price_sale' => $cartItem->price, // Use price from cartItem (which is effective_price)
-                    'total' => $cartItem->quantity * $cartItem->price,
+                    'price' => $cartItem->price,
+                    'price_sale' => $cartItem->price,
+'total' => $cartItem->quantity * $cartItem->price,
                     'size_id' => $productVariant->size_id,
                     'size_name' => $productVariant->size->size ?? null,
                     'color_id' => $productVariant->color_id,
                 ]);
                 Log::info('OrderController@store: Chi tiết đơn hàng được tạo.', ['order_detail_id' => $orderDetail->id, 'product_name' => $product->name, 'quantity' => $cartItem->quantity, 'price' => $cartItem->price]);
-
-                // Cập nhật số lượng của ProductVariant
                 if ($productVariant) {
                     $productVariant->quantity -= $cartItem->quantity;
                     $productVariant->save();
                     Log::info('OrderController@store: Số lượng biến thể sản phẩm được cập nhật.', ['product_variant_id' => $productVariant->id, 'new_quantity' => $productVariant->quantity]);
                 }
-
                 $orderDetails[] = $orderDetail;
             }
 
@@ -180,17 +185,12 @@ class OrderController extends Controller
                 Log::info('OrderController@store: Voucher usage được ghi lại.', ['user_id' => $userId, 'voucher_id' => $voucherId]);
             }
 
-            // KHÔNG XÓA GIỎ HÀNG Ở ĐÂY - CHỈ XÓA KHI THANH TOÁN THÀNH CÔNG
-            // CartItem::where('cart_id', $cart->id)->delete();
-            // Log::info('OrderController@store: Các mặt hàng trong giỏ hàng đã bị xóa.', ['cart_id' => $cart->id]);
-
             // Kiểm tra phương thức thanh toán: nếu là Online Payment (payment_method = 2)
             if ($request->input('payment_method') == 2) {
                 Log::info('OrderController@store: Phương thức thanh toán là Online Payment.');
                 $paymentResponse = $this->createPaymentUrl($request, $totalAmount, $order->id);
                 $paymentData = $paymentResponse->getData(true);
                 Log::info('OrderController@store: Phản hồi từ createPaymentUrl.', ['payment_response' => $paymentData]);
-
                 if (isset($paymentData['payment_url'])) {
                     Log::info('OrderController@store: Trả về URL thanh toán.', ['payment_url' => $paymentData['payment_url']]);
                     return response()->json([
@@ -206,18 +206,15 @@ class OrderController extends Controller
 
             // Nếu là COD, xóa giỏ hàng và trả về kết quả đơn hàng đã được tạo
             Log::info('OrderController@store: Phương thức thanh toán là COD. Xóa giỏ hàng và trả về kết quả đơn hàng.');
-
-            // Xóa giỏ hàng chỉ khi thanh toán COD thành công
-            CartItem::where('cart_id', $cart->id)->delete();
+CartItem::where('cart_id', $cart->id)->delete();
             Log::info('OrderController@store: Các mặt hàng trong giỏ hàng đã bị xóa (COD).', ['cart_id' => $cart->id]);
-
             return response()->json([
                 'status' => true,
-                'message' => 'Đơn hàng đã được tạo thành công.',
-                'order_id' => $orderId,
-                'total_amount' => $totalAmount,
-                'order_details' => $orderDetails,
-            ], 201);
+            'message' => 'Đơn hàng đã được tạo thành công.',
+            'order_id' => $orderId,
+            'total_amount' => $totalAmount,
+            'order_details' => $orderDetails,
+        ], 201);
         } catch (\Exception $e) {
             Log::error('OrderController@store: Đã xảy ra lỗi trong quá trình xử lý đơn hàng.', ['exception' => $e->getMessage()]);
 
@@ -275,7 +272,7 @@ class OrderController extends Controller
             'TxnRef' => $vnp_TxnRef,
             'OrderInfo' => $vnp_OrderInfo,
             'OrderType' => $vnp_OrderType,
-            'Amount' => $vnp_Amount,
+'Amount' => $vnp_Amount,
             'Locale' => $vnp_Locale,
             'IpAddr' => $vnp_IpAddr
         ]);
@@ -347,8 +344,8 @@ class OrderController extends Controller
             $cartItemIds = $validated['cart_item_ids'];
 
             // 2. Check user authentication
-            if (!Auth::check()) {
-                Log::warning('OrderController@createFromSelection: Người dùng chưa đăng nhập.');
+if (!Auth::check()) {
+Log::warning('OrderController@createFromSelection: Người dùng chưa đăng nhập.');
                 return response()->json(['message' => 'User not logged in.'], 401);
             }
             $userId = Auth::id();
@@ -389,17 +386,61 @@ class OrderController extends Controller
             // Voucher logic (adapted from store method)
             $voucherId = $validated['voucher_id'] ?? null;
             $discountValue = 0;
-            if ($voucherId) {
-                // This logic should be refactored into a private reusable method in a real application
-                // For now, we'll keep it simple
-            }
+                $voucher = null;
+                if ($voucherId) {
+                    $voucher = Voucher::find($voucherId);
+                    Log::info('OrderController@createFromSelection: Voucher ID được cung cấp', ['voucher_id' => $voucherId]);
+                    if ($voucher && $voucher->is_active == 1 && $voucher->quantity > 0) {
+                        $currentDate = now();
+                        $voucherUsageExists = DB::table('voucher_usages')
+                            ->where('user_id', $userId)
+                            ->where('voucher_id', $voucherId)
+->exists();
+                        if ($voucherUsageExists) {
+                            Log::warning('OrderController@createFromSelection: Người dùng đã sử dụng voucher này rồi.', ['user_id' => $userId, 'voucher_id' => $voucherId]);
+                            return response()->json(['message' => 'Bạn đã sử dụng voucher này rồi.'], 400);
+                        }
+                        if ($currentDate < $voucher->start_day || $currentDate > $voucher->end_day) {
+                            Log::warning('OrderController@createFromSelection: Voucher đã hết hạn hoặc chưa có hiệu lực.', ['voucher_id' => $voucherId, 'start_day' => $voucher->start_day, 'end_day' => $voucher->end_day]);
+                            return response()->json(['message' => 'Phiếu giảm giá đã hết hạn hoặc chưa có hiệu lực.'], 400);
+                        }
+                        if ($totalAmount <= $voucher->total_min) {
+                            Log::warning('OrderController@createFromSelection: Tổng tiền đơn hàng thấp hơn mức tối thiểu của voucher.', ['total_amount' => $totalAmount, 'min_amount' => $voucher->total_min]);
+                            return response()->json(['message' => 'Tổng số tiền đặt hàng thấp hơn mức tối thiểu bắt buộc để được hưởng ưu đãi.'], 400);
+                        }
+                        if ($totalAmount >= $voucher->total_max) {
+                            Log::warning('OrderController@createFromSelection: Tổng tiền đơn hàng vượt quá mức tối đa của voucher.', ['total_amount' => $totalAmount, 'max_amount' => $voucher->total_max]);
+                            return response()->json(['message' => 'Tổng số tiền đặt hàng vượt quá mức tối đa được phép hưởng ưu đãi.'], 400);
+                        }
+                        $discountValue = min($voucher->discount_value, $totalAmount);
+                        $voucher->increment('used_times');
+                        $voucher->decrement('quantity');
+                        $voucher->save();
+                        Log::info('OrderController@createFromSelection: Voucher được áp dụng.', ['voucher_id' => $voucherId, 'discount_value' => $discountValue]);
+                    } else {
+                        Log::warning('OrderController@createFromSelection: Voucher không hợp lệ hoặc không khả dụng.', ['voucher_id' => $voucherId]);
+                        return response()->json(['message' => 'Phiếu mua hàng không hợp lệ'], 400);
+                    }
+                }
             $totalAmount -= $discountValue;
+                $totalAmountBeforeDiscount = $cartItems->sum(fn($item) => $item->quantity * $item->price);
+                $totalAmount -= $discountValue;
 
-            // Create Order ID
+            // Create Order ID (random 6 digits for uniqueness)
             $today = now()->format('dmY');
-            $latestOrder = Order::where('id', 'LIKE', "$today%")->latest('id')->first();
-            $newIdSuffix = $latestOrder ? (int)substr($latestOrder->id, -4) + 1 : 1;
-            $orderId = $today . str_pad($newIdSuffix, 4, '0', STR_PAD_LEFT);
+            $maxRetry = 20;
+            $orderId = null;
+            for ($try = 0; $try < $maxRetry; $try++) {
+$randomSuffix = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                $orderId = $today . $randomSuffix;
+if (!Order::where('id', $orderId)->exists()) {
+                    break;
+                }
+                usleep(100000);
+            }
+            if (!$orderId) {
+                return response()->json(['message' => 'Không thể tạo mã đơn hàng, vui lòng thử lại.'], 500);
+            }
 
             $order = Order::create([
                 'id' => $orderId,
@@ -415,28 +456,30 @@ class OrderController extends Controller
             ]);
 
             // Create Order Details
-            foreach ($cartItems as $cartItem) {
-                $productVariant = $cartItem->productVariant;
-                $product = $productVariant->product;
-                Order_detail::create([
-                    'order_id' => $orderId,
-                    'product_id' => $product->id,
-                    'product_variant_id' => $productVariant->id,
-                    'product_name' => $product->name,
-                    'quantity' => $cartItem->quantity,
-                    'price' => $cartItem->price,
-                    'price_sale' => $cartItem->price,
-                    'total' => $cartItem->quantity * $cartItem->price,
-                    'size_id' => $productVariant->size_id,
-                    'size_name' => $productVariant->size->size ?? null,
-                    'color_id' => $productVariant->color_id,
-                ]);
-
-                if ($productVariant) {
-                    $productVariant->quantity -= $cartItem->quantity;
-                    $productVariant->save();
+                // Phân bổ giảm giá cho từng sản phẩm
+                $discountRate = $totalAmountBeforeDiscount > 0 ? ($discountValue / $totalAmountBeforeDiscount) : 0;
+                foreach ($cartItems as $cartItem) {
+                    $productVariant = $cartItem->productVariant;
+                    $product = $productVariant->product;
+                    $price_sale = $cartItem->price * (1 - $discountRate);
+                    Order_detail::create([
+                        'order_id' => $orderId,
+                        'product_id' => $product->id,
+                        'product_variant_id' => $productVariant->id,
+                        'product_name' => $product->name,
+                        'quantity' => $cartItem->quantity,
+                        'price' => $cartItem->price,
+                        'price_sale' => round($price_sale, 0),
+                        'total' => round($cartItem->quantity * $price_sale, 0),
+                        'size_id' => $productVariant->size_id,
+                        'size_name' => $productVariant->size->size ?? null,
+                        'color_id' => $productVariant->color_id,
+                    ]);
+                    if ($productVariant) {
+                        $productVariant->quantity -= $cartItem->quantity;
+                        $productVariant->save();
+                    }
                 }
-            }
 
             // Record voucher usage
             if ($voucherId) {
@@ -450,7 +493,7 @@ class OrderController extends Controller
                 if (isset($paymentData['payment_url'])) {
                     // Don't delete cart items until payment is confirmed
                     return response()->json([
-                        'status' => true,
+'status' => true,
                         'message' => 'Order created, please complete payment.',
                         'payment_url' => $paymentData['payment_url'],
                         'order_id' => $orderId,
@@ -459,8 +502,7 @@ class OrderController extends Controller
                     return response()->json(['message' => 'Failed to create payment URL.'], 500);
                 }
             }
-
-            // For COD, clear selected items from cart
+// For COD, clear selected items from cart
             CartItem::whereIn('id', $cartItemIds)->delete();
             Log::info('OrderController@createFromSelection: Các mục đã chọn trong giỏ hàng đã bị xóa (COD).', ['cart_item_ids' => $cartItemIds]);
 

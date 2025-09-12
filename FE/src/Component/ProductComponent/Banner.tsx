@@ -1,4 +1,3 @@
-
 const Banner: React.FC = () => {
     return (
         <>

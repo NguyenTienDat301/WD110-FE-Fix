@@ -23,14 +23,32 @@ class BlogController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'title' => 'required|string|max:255',
-            'description' => 'required|string|max:1024',
-            'content' => 'required|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:8192',
-            'is_active' => 'required|boolean',
-        ]);
+        $data = $request->validate(
+            [
+                'category_id' => 'required|exists:categories,id',
+                'title' => 'required|string|max:255',
+                'description' => 'required|string|max:1024',
+                'content' => 'required|string',
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:8192',
+                'is_active' => 'required|boolean',
+            ],
+            [
+                'required' => ':attribute không được để trống.',
+                'exists' => ':attribute không hợp lệ.',
+                'string' => ':attribute phải là một chuỗi ký tự.',
+                'max' => ':attribute không được vượt quá :max ký tự.',
+                'image' => ':attribute phải là một tệp ảnh.',
+                'mimes' => ':attribute phải có định dạng là: :values.',
+            ],
+            [
+                'category_id' => 'Danh mục',
+                'title' => 'Tiêu đề',
+                'description' => 'Mô tả',
+                'content' => 'Nội dung',
+                'image' => 'Hình ảnh',
+                'is_active' => 'Trạng thái',
+            ]
+        );
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('blogs', 'public');
@@ -52,14 +70,32 @@ class BlogController extends Controller
     {
         try {
             // Validate dữ liệu
-            $data = $request->validate([
-                'category_id' => 'required|exists:categories,id',
-                'title' => 'required|string|max:255',
-                'description' => 'required|string|max:1024',
-                'content' => 'required|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:8192',
-                'is_active' => 'required|boolean',
-            ]);
+            $data = $request->validate(
+                [
+                    'category_id' => 'required|exists:categories,id',
+                    'title' => 'required|string|max:255',
+                    'description' => 'required|string|max:1024',
+                    'content' => 'required|string',
+                    'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:8192',
+                    'is_active' => 'required|boolean',
+                ],
+                [
+                    'required' => ':attribute không được để trống.',
+                    'exists' => ':attribute không hợp lệ.',
+                    'string' => ':attribute phải là một chuỗi ký tự.',
+                    'max' => ':attribute không được vượt quá :max ký tự.',
+                    'image' => ':attribute phải là một tệp ảnh.',
+                    'mimes' => ':attribute phải có định dạng là: :values.',
+                ],
+                [
+                    'category_id' => 'Danh mục',
+                    'title' => 'Tiêu đề',
+                    'description' => 'Mô tả',
+                    'content' => 'Nội dung',
+                    'image' => 'Hình ảnh',
+                    'is_active' => 'Trạng thái',
+                ]
+            );
 
             // Lấy bài viết cần cập nhật
             $blog = Blog::findOrFail($id);

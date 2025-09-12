@@ -48,7 +48,7 @@ class OrderController extends Controller
                 $allowedTransitions = [
                     0 => [1, 4], // Chờ xử lý -> Đã xử lý hoặc Hủy
                     1 => [2, 4], // Đã xử lý -> Đang vận chuyển hoặc Hủy
-                    2 => [3, 4], // Đang vận chuyển -> Giao hàng thành công hoặc Hủy
+                    2 => [3],    // Đang vận chuyển -> Giao hàng thành công
                     3 => [5],    // Giao hàng thành công -> Đã trả lại
                     4 => [],     // Đã hủy -> Không thể chuyển sang trạng thái khác
                     5 => []      // Đã trả lại -> Không thể chuyển sang trạng thái khác
@@ -134,7 +134,7 @@ class OrderController extends Controller
         $allowedTransitions = [
             0 => [1, 4], // Chờ xử lý -> Đã xử lý hoặc Hủy
             1 => [2, 4], // Đã xử lý -> Đang vận chuyển hoặc Hủy
-            2 => [3, 4], // Đang vận chuyển -> Giao hàng thành công hoặc Hủy
+            2 => [3],    // Đang vận chuyển -> Giao hàng thành công
             3 => [5],    // Giao hàng thành công -> Đã trả lại
             4 => [],     // Đã hủy -> Không thể chuyển
             5 => []      // Đã trả lại -> Không thể chuyển

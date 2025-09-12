@@ -28,12 +28,26 @@ class LogoBannerController extends Controller
         }
 
         // Validate dữ liệu từ request
-        $data = $request->validate([
-            'type' => 'required',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string|max:8192',
-            'image' => 'required|image',
-        ]);
+        $data = $request->validate(
+            [
+                'type' => 'required',
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string|max:8192',
+                'image' => 'required|image',
+            ],
+            [
+                'required' => ':attribute không được để trống.',
+                'string' => ':attribute phải là một chuỗi ký tự.',
+                'max' => ':attribute không được vượt quá :max ký tự.',
+                'image' => ':attribute phải là một tệp ảnh.',
+            ],
+            [
+                'type' => 'Loại',
+                'title' => 'Tiêu đề',
+                'description' => 'Mô tả',
+                'image' => 'Hình ảnh',
+            ]
+        );
 
         // Nếu có file hình ảnh, lưu vào storage
         if ($request->hasFile('image')) {
@@ -57,13 +71,29 @@ class LogoBannerController extends Controller
     {
         try {
             // Kiểm tra dữ liệu gửi lên
-            $data = $request->validate([
-                'type' => 'required',
-                'title' => 'required|string|max:255',
-                'description' => 'nullable|string|max:8192',
-                'image' => 'nullable|image', // Không bắt buộc phải có hình ảnh
-                'is_active' => 'required|boolean', // Đảm bảo is_active được gửi đúng
-            ]);
+            $data = $request->validate(
+                [
+                    'type' => 'required',
+                    'title' => 'required|string|max:255',
+                    'description' => 'nullable|string|max:8192',
+                    'image' => 'nullable|image', // Không bắt buộc phải có hình ảnh
+                    'is_active' => 'required|boolean', // Đảm bảo is_active được gửi đúng
+                ],
+                [
+                    'required' => ':attribute không được để trống.',
+                    'string' => ':attribute phải là một chuỗi ký tự.',
+                    'max' => ':attribute không được vượt quá :max ký tự.',
+                    'image' => ':attribute phải là một tệp ảnh.',
+                    'boolean' => ':attribute phải là true hoặc false.',
+                ],
+                [
+                    'type' => 'Loại',
+                    'title' => 'Tiêu đề',
+                    'description' => 'Mô tả',
+                    'image' => 'Hình ảnh',
+                    'is_active' => 'Trạng thái',
+                ]
+            );
 
             $logoBanner = LogoBanner::findOrFail($id);
 

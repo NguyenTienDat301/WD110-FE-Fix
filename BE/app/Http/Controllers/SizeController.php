@@ -43,9 +43,11 @@ class SizeController extends Controller
         $data = $request->validate([
             'size'      => 'required|max:25|unique:sizes,size',
         ], [
-            'size.required' => 'Vui lòng nhập kích cỡ.',
-            'size.max' => 'Kích cỡ không được vượt quá 25 ký tự.',
-            'size.unique' => 'Kích cỡ này đã tồn tại. Vui lòng nhập kích cỡ khác.',
+            'size.required' => ':attribute không được để trống.',
+            'size.max' => ':attribute không được vượt quá 25 ký tự.',
+            'size.unique' => ':attribute này đã tồn tại.',
+        ], [
+            'size' => 'Kích cỡ'
         ]);
 
         try {
@@ -83,9 +85,11 @@ class SizeController extends Controller
         $data = $request->validate([
             'size'      => 'required|max:25|unique:sizes,size,' . $size->id,
         ], [
-            'size.required' => 'Vui lòng nhập kích cỡ.',
-            'size.max' => 'Kích cỡ không được vượt quá 25 ký tự.',
-            'size.unique' => 'Kích cỡ này đã tồn tại. Vui lòng nhập kích cỡ khác.',
+            'size.required' => ':attribute không được để trống.',
+            'size.max' => ':attribute không được vượt quá 25 ký tự.',
+            'size.unique' => ':attribute này đã tồn tại.',
+        ], [
+            'size' => 'Kích cỡ'
         ]);
 
         try {

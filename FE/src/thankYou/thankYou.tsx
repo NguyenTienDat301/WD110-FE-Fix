@@ -1,7 +1,30 @@
 import "./thank.css";
 import { DeleteOutlined, CheckOutlined } from "@ant-design/icons";
+import { useEffect } from "react";
+import { useAppDispatch } from "../Redux/store";
+import { clearCart } from "../Redux/Reducer/CartReducer";
 
 function ThankYou() {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    // Xóa giỏ hàng khi thanh toán online thành công
+    const user = localStorage.getItem("user");
+    if (user) {
+      try {
+        const parsedUser = JSON.parse(user);
+        const userId = parsedUser.user?.id || parsedUser.id;
+        if (userId) {
+          dispatch(clearCart(Number(userId)));
+        }
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+    // Xóa localStorage
+    localStorage.removeItem("cartItems");
+  }, [dispatch]);
+
   return (
     <>
       <section className="thank">

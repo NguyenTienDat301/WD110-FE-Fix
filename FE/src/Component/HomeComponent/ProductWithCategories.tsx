@@ -145,19 +145,21 @@ const ProductWithCategories: React.FC = () => {
                     data-wow-delay=".5s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
-                      <div className="cardProduct wow fadeInUp">
-                        <div className="cardImage">
+                      <div className="cardProduct wow fadeInUp" style={{ height: '100%' }}>
+                        <div className="cardImage" style={{ height: '270px', overflow: 'hidden' }}>
                           {/* <label className="lbl-hot">hot</label> */}
-                          <div>
+                          <div style={{ height: '100%' }}>
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                           </div>
                           <div className="button-select">
@@ -165,19 +167,10 @@ const ProductWithCategories: React.FC = () => {
                           </div>
                         </div>
                         <div className="cardInfo">
-                          <h6
-                            className="font-md-bold cardTitle"
-                            style={{
-                              fontFamily: "Raleway",
-                              fontWeight: "normal",
-                            }}
-                          >
+                          <h6 className="font-md-bold cardTitle">
                             {product.name}
                           </h6>
-                          <p
-                            className="font-lg cardDesc"
-                            style={{ fontFamily: "Raleway" }}
-                          >
+                          <p className="font-lg cardDesc">
                             {" "}
                             {Math.round(product.price ?? 0).toLocaleString(
                               "vi-VN",
@@ -205,19 +198,21 @@ const ProductWithCategories: React.FC = () => {
                     data-wow-delay=".1s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
-                      <div className="cardProduct wow fadeInUp">
-                        <div className="cardImage">
+                      <div className="cardProduct wow fadeInUp" style={{ height: '100%' }}>
+                        <div className="cardImage" style={{ height: '270px', overflow: 'hidden' }}>
                           <label className="lbl-hot">hot</label>
-                          <div>
+                          <div style={{ height: '100%' }}>
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                           </div>
                           <div className="button-select">
@@ -225,19 +220,10 @@ const ProductWithCategories: React.FC = () => {
                           </div>
                         </div>
                         <div className="cardInfo">
-                          <h6
-                            className="font-md-bold cardTitle"
-                            style={{
-                              fontFamily: "Raleway",
-                              fontWeight: "normal",
-                            }}
-                          >
+                          <h6 className="font-md-bold cardTitle">
                             {product.name}
                           </h6>
-                          <p
-                            className="font-lg cardDesc"
-                            style={{ fontFamily: "Raleway" }}
-                          >
+                          <p className="font-lg cardDesc">
                             {Math.round(product.price ?? 0).toLocaleString(
                               "vi-VN",
                               { style: "currency", currency: "VND" }
@@ -268,19 +254,21 @@ const ProductWithCategories: React.FC = () => {
                     data-wow-delay=".1s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
-                      <div className="cardProduct wow fadeInUp">
-                        <div className="cardImage">
+                      <div className="cardProduct wow fadeInUp" style={{ height: '100%' }}>
+                        <div className="cardImage" style={{ height: '270px', overflow: 'hidden' }}>
                           <label className="lbl-hot">new</label>
-                          <div>
+                          <div style={{ height: '100%' }}>
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                           </div>
                           <div className="button-select">
@@ -288,19 +276,10 @@ const ProductWithCategories: React.FC = () => {
                           </div>
                         </div>
                         <div className="cardInfo">
-                          <h6
-                            className="font-md-bold cardTitle"
-                            style={{
-                              fontFamily: "Raleway",
-                              fontWeight: "normal",
-                            }}
-                          >
+                          <h6 className="font-md-bold cardTitle">
                             {product.name}
                           </h6>
-                          <p
-                            className="font-lg cardDesc"
-                            style={{ fontFamily: "Raleway" }}
-                          >
+                          <p className="font-lg cardDesc">
                             {" "}
                             {Math.round(product.price ?? 0).toLocaleString(
                               "vi-VN",

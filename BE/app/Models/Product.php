@@ -4,21 +4,25 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes; // Add this line
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes; // Add SoftDeletes here
     protected $fillable = [
         'name',
-        'avatar',
-        'category_id',
-        'import_price',
-        'price',
+        'slug',
+        'img_thumb',
         'description',
-        'is_active',
-        'quantity',
-        'sell_quantity',
+        'category_id',
         'view',
+        'is_active',
+        'deleted_at',
+        'created_at',
+        'updated_at',
+        'sell_quantity', // Cho phép cập nhật số lượng đã bán
     ];
 
     public function galleries()
@@ -41,32 +45,66 @@ class Product extends Model
         return $this->hasMany(Order::class);
     }
 
-     public function reviews()
+    public function reviews()
     {
         return $this->hasMany(Review::class)->where('is_reviews', 1);
     }
 
+    /**
+     * Relationship with ProductVariant
+     */
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    /**
+     * Get available variants (quantity > 0)
+     */
+    public function availableVariants()
+    {
+        return $this->hasMany(ProductVariant::class)->where('quantity', '>', 0);
+    }
+
+    /**
+     * Get all sizes available for this product through variants
+     */
     public function sizes()
     {
-        return $this->belongsToMany(Size::class, 'product_size', 'product_id', 'size_id');
+        return $this->belongsToMany(Size::class, 'product_variants', 'product_id', 'size_id')
+                   ->distinct();
     }
 
+    /**
+     * Get all colors available for this product through variants
+     */
     public function colors()
     {
-        return $this->belongsToMany(Color::class, 'product_color', 'product_id', 'color_id');
+        return $this->belongsToMany(Color::class, 'product_variants', 'product_id', 'color_id')
+                   ->distinct();
     }
-    public function deleteProduct()
+
+    /**
+     * Get minimum price from all variants
+     */
+    public function getMinPriceAttribute()
     {
-        // Xóa avatar
-        Storage::disk('public')->delete($this->avatar);
+        return $this->variants()->min('price') ?? 0;
+    }
 
-        // Xóa gallery
-        foreach ($this->galleries as $gallery) {
-            Storage::disk('public')->delete($gallery->image_path);
-            $gallery->delete();
-        }
+    /**
+     * Get maximum price from all variants
+     */
+    public function getMaxPriceAttribute()
+    {
+        return $this->variants()->max('price') ?? 0;
+    }
 
-        // Xóa bản ghi
-        $this->delete();
+    /**
+     * Get total quantity from all variants
+     */
+    public function getTotalQuantityAttribute()
+    {
+        return $this->variants()->sum('quantity') ?? 0;
     }
 }

@@ -79,6 +79,9 @@ const NewProduct: React.FC = () => {
                           { style: "currency", currency: "VND" }
                         )}
                       </p>
+                      <p className="font-sm text-success mb-0">
+                            Đã bán: <b>{product.total_sold}</b>
+                          </p>
                     </div>
                   </div>
                 </SwiperSlide>

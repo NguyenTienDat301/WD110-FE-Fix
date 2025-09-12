@@ -7,68 +7,67 @@
 @section('content_admin')
 
     @if (session('success'))
-        <div class="alert alert-success text-center mt-5">
+        <div class="alert alert-success text-center mt-3">
             {{ session('success') }}
         </div>
     @endif
-
     @if (session('error'))
-        <div class="alert alert-danger mt-5 ">
+        <div class="alert alert-danger mt-3">
             {{ session('error') }}
         </div>
     @endif
 
-    <h1 class="text-center mt-5 mb-3">Danh sách sản phẩm</h1>
-
-    <a href="{{ route('products.create') }}" class="btn btn-outline-success mb-4"
-        style="font-size: 1.1em; padding: 10px 20px;">Thêm mới sản phẩm</a>
-
-    <div class="d-flex gap-3 mb-4">
-        <!-- Price Order Filter -->
-        <form style="width: 200px;" method="GET" action="{{ route('products.index') }}">
-            <select style="padding: 10px;" name="price_order" class="form-control" onchange="this.form.submit()">
-                <option value="">Sắp xếp giá</option>
-                <option value="asc" {{ request('price_order') == 'asc' ? 'selected' : '' }}>Giá tăng dần</option>
-                <option value="desc" {{ request('price_order') == 'desc' ? 'selected' : '' }}>Giá giảm dần</option>
-            </select>
-        </form>
-
-        <!-- Status Filter -->
-        <form style="width: 200px;" method="GET" action="{{ route('products.index') }}">
-            <select style="padding: 10px;" name="is_active" class="form-control" onchange="this.form.submit()">
-                <option value="">Tất cả trạng thái</option>
-                <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>Hiển thị</option>
-                <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>Ẩn</option>
-            </select>
-        </form>
-
-        <!-- Price Range Filter -->
-        <form style="width: 200px;" method="GET" action="{{ route('products.index') }}">
-            <select style="padding: 10px;" name="price_range" class="form-control" onchange="this.form.submit()">
-                <option value="">Chọn mức giá</option>
-                <option value="under_200k" {{ request('price_range') == 'under_200k' ? 'selected' : '' }}>Dưới 200k</option>
-                <option value="200k_500k" {{ request('price_range') == '200k_500k' ? 'selected' : '' }}>200k - 500k</option>
-                <option value="over_500k" {{ request('price_range') == 'over_500k' ? 'selected' : '' }}>Trên 500k</option>
-            </select>
-        </form>
+    <div class="content-header">
+        <div class="container-fluid">
+            <h1 class="m-0 text-center">Danh sách sản phẩm</h1>
+        </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Hình ảnh</th>
-                    <th>Tên sản phẩm</th>
-                    <th>Slug</th>
-                    <th>Danh mục</th>
-                    <th>Khoảng giá</th>
-                    <th>Tổng tồn kho</th>
-                    <th>Số biến thể</th>
-                    <th>Trạng thái</th>
-                    <th>Lượt xem</th>
-                    <th>Thao tác</th>
-                </tr>
+    <div class="container-fluid">
+        <div class="card card-outline card-success">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <a href="{{ route('products.create') }}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Thêm mới sản phẩm
+                </a>
+                <div class="d-flex gap-2">
+                    <form method="GET" action="{{ route('products.index') }}" class="mr-2">
+                        <select name="price_order" class="form-control" onchange="this.form.submit()">
+                            <option value="">Sắp xếp giá</option>
+                            <option value="asc" {{ request('price_order') == 'asc' ? 'selected' : '' }}>Giá tăng dần</option>
+                            <option value="desc" {{ request('price_order') == 'desc' ? 'selected' : '' }}>Giá giảm dần</option>
+                        </select>
+                    </form>
+                    <form method="GET" action="{{ route('products.index') }}" class="mr-2">
+                        <select name="is_active" class="form-control" onchange="this.form.submit()">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>Hiển thị</option>
+                            <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>Ẩn</option>
+                        </select>
+                    </form>
+                    <form method="GET" action="{{ route('products.index') }}">
+                        <select name="price_range" class="form-control" onchange="this.form.submit()">
+                            <option value="">Chọn mức giá</option>
+                            <option value="under_200k" {{ request('price_range') == 'under_200k' ? 'selected' : '' }}>Dưới 200k</option>
+                            <option value="200k_500k" {{ request('price_range') == '200k_500k' ? 'selected' : '' }}>200k - 500k</option>
+                            <option value="over_500k" {{ request('price_range') == 'over_500k' ? 'selected' : '' }}>Trên 500k</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="min-width: 50px;">ID</th>
+                                <th style="min-width: 80px;">Hình ảnh</th>
+                                <th style="min-width: 100px;">Tên sản phẩm</th>
+                                <th style="min-width: 140px;">Slug</th>
+                                <th style="min-width: 120px;">Danh mục</th>
+                                <th style="min-width: 110px;">Tổng tồn kho</th>
+                                <th style="min-width: 100px;">Trạng thái</th>
+                                <th style="min-width: 140px;">Thao tác</th>
+                            </tr>
             </thead>
             <tbody>
                 @forelse ($products as $product)
@@ -89,7 +88,7 @@
                             <code>{{ $product->slug ?? 'Chưa có slug' }}</code>
                         </td>
                         <td>{{ $product->categories->name ?? 'Không có' }}</td>
-                        <td>
+                        {{-- <td>
                             @if ($product->variants->count() > 0)
                                 <span class="badge bg-success">
                                     {{ number_format($product->min_price) }}đ - {{ number_format($product->max_price) }}đ
@@ -97,27 +96,27 @@
                             @else
                                 <span class="badge bg-warning">Chưa có biến thể</span>
                             @endif
-                        </td>
+                        </td> --}}
                         <td>
                             <span class="badge bg-info">
                                 {{ $product->total_quantity ?? 0 }}
                             </span>
                         </td>
-                        <td>
+                        {{-- <td>
                             <span class="badge bg-primary">
                                 {{ $product->variants->count() }}
                             </span>
-                        </td>
+                        </td> --}}
                         <td>
                             @if ($product->is_active)
                                 <span class="badge bg-success">Hiển thị</span>
-                                <small class="d-block text-muted">(is_active = {{ $product->is_active ? 'true' : 'false' }})</small>
+                                {{-- <small class="d-block text-muted">(is_active = {{ $product->is_active ? 'true' : 'false' }})</small> --}}
                             @else
                                 <span class="badge bg-danger">Ẩn</span>
-                                <small class="d-block text-muted">(is_active = {{ $product->is_active ? 'true' : 'false' }})</small>
+                                {{-- <small class="d-block text-muted">(is_active = {{ $product->is_active ? 'true' : 'false' }})</small> --}}
                             @endif
                         </td>
-                        <td>{{ $product->view ?? 0 }}</td>
+                        {{-- <td>{{ $product->view ?? 0 }}</td> --}}
                         <td>
                             <div class="d-flex flex-wrap gap-1">
                                 <!-- Xem chi tiết -->
@@ -157,6 +156,18 @@
                                     </button>
                                 </form>
                             </div>
+                                <style>
+                                    /* Đảm bảo các nút thao tác luôn nằm cùng một hàng, không bị lệch khi không có ảnh */
+                                    td:last-child .d-flex {
+                                        flex-wrap: nowrap !important;
+                                        gap: 6px;
+                                        justify-content: center;
+                                        align-items: center;
+                                    }
+                                    td:last-child .btn {
+                                        min-width: 70px;
+                                    }
+                                </style>
                         </td>
                     </tr>
                 @empty

@@ -102,6 +102,7 @@ const BlogComponent: React.FC = () => {
                         <img src={b.image} alt="kidify" />
                         <div className="cardInfo">
                           <h2 className="font-42-bold mb-10">{b.title}</h2>
+                          {/* <div className="box-meta-post mb-20"><span className="font-sm neutral-500">August 30, 2023</span><span className="font-sm neutral-500">4 Mins read</span><span className="font-sm neutral-500">520 views</span></div> */}
                           <p className="font-lg">{b.description}</p>
                           <div className="mt-25 text-end">
                             <a className="btn btn-arrow-right" href="#">

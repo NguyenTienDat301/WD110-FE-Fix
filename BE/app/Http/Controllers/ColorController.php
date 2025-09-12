@@ -42,10 +42,20 @@ class ColorController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'name_color'      => 'required|max:25',
-            'hex_color'        => 'required|max:25'
-        ]);
+        $data = $request->validate(
+            [
+                'name_color'      => 'required|max:25',
+                'hex_color'        => 'required|max:25'
+            ],
+            [
+                'name_color.required' => ':attribute không được để trống.',
+                'hex_color.required' => ':attribute không được để trống.',
+            ],
+            [
+                'name_color' => 'Tên màu',
+                'hex_color' => 'Mã màu Hex',
+            ]
+        );
 
 
         try {
@@ -80,9 +90,17 @@ class ColorController extends Controller
      */
     public function update(Request $request, Color $color)
     {
-        $data = $request->validate([
-            'name_color'      => 'required|max:25',
-        ]);
+        $data = $request->validate(
+            [
+                'name_color'      => 'required|max:25',
+            ],
+            [
+                'name_color.required' => ':attribute không được để trống.',
+            ],
+            [
+                'name_color' => 'Tên màu',
+            ]
+        );
 
         try {
             $color->update($data);  // Cập nhật bản ghi cụ thể

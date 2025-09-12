@@ -11,7 +11,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, HasApiTokens, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -30,7 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'role'
     ];
 
-     /**
+    /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
@@ -40,7 +40,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
-     /**
+    /**
      * The attributes that should be cast.
      *
      * @var array<string, string>
@@ -50,7 +50,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
-     /**
+    /**
      * Check if the user's email has been verified.
      *
      * @return bool
@@ -60,7 +60,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return !is_null($this->email_verified_at);
     }
 
-     /**
+    /**
      * Get the ship addresses associated with the user.
      */
     public function shipAddresses()
@@ -76,7 +76,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Cart::class);
     }
 
-     /**
+    /**
      * Get the orders associated with the user.
      */
     public function orders()
@@ -84,7 +84,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Order::class);
     }
 
-     /**
+    /**
      * Get the reviews written by the user.
      */
     public function reviews()
@@ -92,11 +92,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Review::class);
     }
 
-      /**
+    /**
      * Get the voucher usage associated with the user.
      */
     public function voucherUsage()
     {
         return $this->hasOne(Voucher_usage::class);
     }
+
+    /**
+     * Get the conversations the user is involved in.
+     */
 }

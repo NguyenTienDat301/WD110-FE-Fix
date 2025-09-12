@@ -11,17 +11,31 @@ class ProductVariant extends Model
 
     protected $fillable = [
         'product_id',
-        'size_id',
         'color_id',
+        'size_id',
         'quantity',
         'price',
-        'price_sale'
+        'image',
+        'price_sale',
     ];
 
-    protected $casts = [
-        'price' => 'decimal:2',
-        'price_sale' => 'decimal:2',
-    ];
+
+    /**
+     * Relationship with Order_detail
+     */
+    public function orderDetails()
+    {
+        return $this->hasMany(\App\Models\Order_detail::class, 'product_variant_id');
+    }
+
+    /**
+     * Get total sold quantity for this variant
+     */
+    public function getSoldQuantityAttribute()
+    {
+        return $this->orderDetails()->sum('quantity');
+    }
+
 
     /**
      * Relationship with Product

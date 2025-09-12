@@ -9,8 +9,18 @@ const Footer: React.FC = () => {
   useEffect(()=>{
     const GetLogo = async () => {
       try {
-        const { data } = await  axios.get(`http://127.0.0.1:8000/api/logobanner/${5}`);
-         setLogo(data.image)
+        const { data } = await axios.get(`http://127.0.0.1:8000/api/logobanner`);
+        const logos = data['2']; // Lấy danh sách logo từ key '2'
+        if (logos && Array.isArray(logos) && logos.length > 0) {
+          const latestLogo = [...logos].sort((a, b) => b.id - a.id)[0];
+          if (latestLogo && latestLogo.image) {
+            setLogo(latestLogo.image);
+          } else {
+            setLogo(Logo);
+          }
+        } else {
+          setLogo(Logo);
+        }
       } catch (error) {
          console.error("Lỗi khi tải logo footer:", error);
          // Sử dụng logo mặc định nếu API fail
