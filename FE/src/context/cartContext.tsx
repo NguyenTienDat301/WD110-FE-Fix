@@ -1,26 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
-import { log } from 'console';
-
-// Định nghĩa kiểu dữ liệu của giỏ hàng
-interface CartItem {
-  id: number;
-  product_id: number;
-  cart_id: number;
-  avatar: string;
-  product_name: string;
-  quantity: number;
-  price: number;
-  size_id: number;
-  color_id: number;
-  total: number;
-  product: {
-    id: number;
-    name: string;
-    avatar: string;
-    price: number;
-  };
-}
 
 interface CartContextType {
   totalQuantity: number;
@@ -43,23 +22,43 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         parsedUser = JSON.parse(user!);
       } catch (error) {
         console.error('Lỗi khi phân tích dữ liệu người dùng:', error);
+        return;
       }
 
-      if (parsedUser && parsedUser.user) {
-        const userId = parsedUser.user.id;
+      if (parsedUser) {
+        const userId = parsedUser.user ? parsedUser.user.id : parsedUser.id;
+        
+        if (!userId) {
+          console.error('Không tìm thấy ID người dùng.');
+          setTotalQuantity(0);
+          return;
+        }
 
-        const response = await axios.get(`http://127.0.0.1:8000/api/carts/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`
+        try {
+          const response = await axios.get(`http://127.0.0.1:8000/api/cart/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          
+          if (response.data && response.data.cart_items) {
+            const total = response.data.cart_items.length;
+            setTotalQuantity(total);
+          } else {
+            setTotalQuantity(0);
           }
-        });
-        const total = response.data.cart_items.length
-        setTotalQuantity(total);
+        } catch (error) {
+          console.error('Lỗi khi lấy giỏ hàng:', error);
+          setTotalQuantity(0);
+        }
       } else {
         console.error('Không tìm thấy thông tin người dùng.');
+        setTotalQuantity(0);
       }
     } catch (error) {
       console.error('Lỗi khi lấy dữ liệu giỏ hàng:', error);
+      // Nếu API fail, set về 0 để tránh crash
+      setTotalQuantity(0);
     }
   };
 

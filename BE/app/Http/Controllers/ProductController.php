@@ -79,6 +79,21 @@ class ProductController extends Controller
             'is_active' => 'boolean',
             'image_path' => 'required|array|min:1',
             'image_path.*' => 'image|max:2048',
+        ], [
+            'name.required' => 'Tên sản phẩm là bắt buộc.',
+            'name.unique' => 'Tên sản phẩm đã tồn tại.',
+            'img_thumb.required' => 'Ảnh đại diện là bắt buộc.',
+            'img_thumb.image' => 'Ảnh đại diện phải là tệp ảnh.',
+            'category_id.required' => 'Danh mục là bắt buộc.',
+            'image_path.required' => 'Ảnh chi tiết là bắt buộc.',
+            'image_path.*.image' => 'Mỗi ảnh chi tiết phải là một tệp ảnh.',
+        ], [
+            'name' => 'Tên sản phẩm',
+            'img_thumb' => 'Ảnh đại diện',
+            'description' => 'Mô tả',
+            'category_id' => 'Danh mục',
+            'image_path' => 'Ảnh chi tiết',
+            'image_path.*' => 'Ảnh chi tiết',
         ]);
 
         try {

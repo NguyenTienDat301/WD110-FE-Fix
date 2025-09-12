@@ -20,6 +20,10 @@ class Voucher extends Model
         'total_min',
         'total_max',
     ];
+    protected $casts = [
+        'start_day' => 'datetime',
+        'end_day' => 'datetime',
+    ];
 
     public function voucherUsages()
     {

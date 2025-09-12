@@ -160,13 +160,27 @@ const Header: React.FC = () => {
     const GetLogo = async () => {
       try {
         const { data } = await axios.get(
-          `http://127.0.0.1:8000/api/logobanner/${5}`
+          `http://127.0.0.1:8000/api/logobanner`
         );
-        setLogo(data.image);
+        const logos = data['2']; // Lấy danh sách logo từ key '2'
+        // Kiểm tra xem có logo nào trong dữ liệu trả về không
+        if (logos && Array.isArray(logos) && logos.length > 0) {
+          // Sắp xếp logo theo ID giảm dần để lấy logo mới nhất
+          const latestLogo = [...logos].sort((a, b) => b.id - a.id)[0];
+          if (latestLogo && latestLogo.image) {
+            setLogo(latestLogo.image);
+          } else {
+            // Phòng trường hợp logo mới nhất không có ảnh
+            setLogo(Logo);
+          }
+        } else {
+          // Sử dụng logo mặc định nếu không có logo nào từ API
+          setLogo(Logo);
+        }
       } catch (error) {
-        // Xử lý lỗi 404 - sử dụng logo mặc định
+        // Xử lý lỗi - sử dụng logo mặc định
         console.error("Không thể tải logo:", error);
-        setLogo(Logo); // Sử dụng logo mặc định
+        setLogo(Logo);
       }
     };
     GetLogo();

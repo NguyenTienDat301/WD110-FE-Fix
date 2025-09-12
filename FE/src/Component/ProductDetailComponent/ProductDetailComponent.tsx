@@ -275,13 +275,13 @@ const ProductDetailComponent: React.FC = () => {
                     </div>
                   )}
                   {/* end */}
-                  <span
+                  {/* <span
                     style={{ fontFamily: "Raleway" }}
                     className="font-md neutral-500"
                   >
                     ({product.reviews.length} Reviews - {product.sell_quantity}{" "}
                     Orders)
-                  </span>
+                  </span> */}
                   <div className="block-price" style={{ marginTop: "20px" }}>
                     <span style={{ fontFamily: "Raleway", fontSize: "25px" }} className="price-main">
                       {selectedVariant

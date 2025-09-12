@@ -45,6 +45,11 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|unique:categories|max:255',
             'is_active' => 'required|boolean',
+        ], [
+            'name.required' => 'Tên danh mục là bắt buộc.',
+            'name.unique' => 'Tên danh mục đã tồn tại.',
+        ], [
+            'name' => 'Tên danh mục',
         ]);
 
         Category::create([
@@ -82,6 +87,11 @@ class CategoryController extends Controller
             $request->validate([
                 'name' => 'required|unique:categories,name,' . $category->id . '|max:255',
                 'is_active' => 'required|boolean',
+            ], [
+                'name.required' => 'Tên danh mục là bắt buộc.',
+                'name.unique' => 'Tên danh mục đã tồn tại.',
+            ], [
+                'name' => 'Tên danh mục',
             ]);
 
             // Kiểm tra nếu địa chỉ được chọn là mặc định

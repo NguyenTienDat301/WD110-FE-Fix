@@ -4,10 +4,12 @@ import { notification, Modal, message } from "antd";
 import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import { fetchCart } from "../../Redux/Reducer/CartReducer";
+import { clearCart } from "../../Redux/Reducer/CartReducer";
 import { postShipAddress } from "../../Redux/Reducer/ShipAddressReducer";
 import api from "../../Axios/Axios";
 import axios from "axios";
 import { postOrder } from "../../Redux/Reducer/OrderReducer";
+import { Order } from "../../Redux/Reducer/OrderReducer";
 import { fetchVouchers } from "../../Redux/Reducer/VoucherReducer";
 import { fetchPaymentStatus } from "../../Redux/Reducer/OrderReducer";
 import QR from "../../assets/imgs/qr.jpg";
@@ -23,7 +25,7 @@ const CheckoutComponent: React.FC = () => {
   const dispatch = useAppDispatch();
   const nav = useNavigate();
   const { userId } = useParams<{ userId: string }>();
-  const cart = useSelector((state: RootState) => state.cart);
+  const [checkoutItems, setCheckoutItems] = useState<any[]>([]);
   const payment_url = useSelector(
     (state: RootState) => state.order.payment_url
   );
@@ -41,6 +43,7 @@ const CheckoutComponent: React.FC = () => {
 
   const [totalPrice, setTotalPrice] = useState(0);
   const [recipientName, setRecipientName] = useState("");
+  const [senderName, setSenderName] = useState(""); // Thêm state cho người gửi
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [shipAddress, setShipAddress] = useState("");
@@ -53,18 +56,52 @@ const CheckoutComponent: React.FC = () => {
   const [isAddress, setIsAddress] = useState<any>();
   const [showModal, setShowModal] = useState<boolean>(false);
   const [isSwitchOn, setIsSwitchOn] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
   useEffect(() => {
-    if (userId) {
-      dispatch(fetchCart(Number(userId)));
+    const fetchSelectedItems = async (selectedIds: number[]) => {
+      try {
+        setLoading(true);
+        const { data } = await api.post("/carts/get-selected", {
+          cart_item_ids: selectedIds,
+        });
+        if (data.status && data.cart_items) {
+          setCheckoutItems(data.cart_items);
+        } else {
+          message.error("Không thể lấy thông tin sản phẩm đã chọn.");
+          navigate("/cart");
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy sản phẩm đã chọn:", error);
+        message.error("Có lỗi xảy ra. Vui lòng thử lại.");
+        navigate("/cart");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const selectedIdsString = localStorage.getItem("selectedCartItems");
+    if (selectedIdsString) {
+      const selectedIds = JSON.parse(selectedIdsString);
+      if (Array.isArray(selectedIds) && selectedIds.length > 0) {
+        fetchSelectedItems(selectedIds);
+      } else {
+        message.warning("Không có sản phẩm nào được chọn để thanh toán.");
+        navigate("/cart");
+      }
+    } else {
+      message.warning("Vui lòng chọn sản phẩm từ giỏ hàng.");
+      navigate("/cart");
     }
+
     dispatch(fetchVouchers());
-  }, [dispatch, userId]);
+  }, [dispatch, navigate]);
 
   const subtotal =
-    cart?.items?.reduce(
+    checkoutItems?.reduce(
       (total: number, item: any) => total + item.price * item.quantity,
       0
     ) || 0;
@@ -77,7 +114,7 @@ const CheckoutComponent: React.FC = () => {
       : 0;
     setDiscount(appliedDiscount);
     setTotalPrice(subtotal - appliedDiscount);
-  }, [cart?.items, voucherId, vouchers]);
+  }, [checkoutItems, voucherId, vouchers]);
 
   const formatCurrency = (amount: string | number): string => {
     const numberAmount =
@@ -103,8 +140,11 @@ const CheckoutComponent: React.FC = () => {
     try {
       const response = await api.get("/address");
       setIsAddress(response.data);
+      console.log('isAddress:', response.data);
+      return response.data;
     } catch (error) {
       console.log(error);
+      return null;
     } finally {
       setLoading(false);
     }
@@ -129,82 +169,17 @@ const CheckoutComponent: React.FC = () => {
     }
     if (checked && isAddress) {
       setRecipientName(isAddress.data.recipient_name);
+      setSenderName(isAddress.data.sender_name || "");
       setPhoneNumber(isAddress.data.phone_number);
       setShipAddress(isAddress.data.ship_address);
     } else {
       setRecipientName("");
+      setSenderName("");
       setPhoneNumber("");
       setShipAddress("");
     }
   };
 
-  const handlePaymentSuccess = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (
-      !recipientName ||
-      !email ||
-      !phoneNumber ||
-      !shipAddress ||
-      !paymentMethodId
-    ) {
-      notification.error({
-        message: "Thông tin không đầy đủ",
-        description: "Vui lòng điền đầy đủ thông tin vào các trường bắt buộc.",
-      });
-      return;
-    }
-
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const userId = user.id ? user.id.toString() : "";
-    const addressData = {
-      user_id: userId,
-      recipient_name: recipientName,
-      is_default: true,
-      ship_address: shipAddress,
-      phone_number: phoneNumber,
-    };
-
-    const shipAddressResponse = await dispatch(
-      postShipAddress(addressData)
-    ).unwrap();
-
-    // Thanh toán
-    const orderData = {
-      user_id: userId,
-      total_amount: totalPrice,
-      ship_address_id: shipAddressResponse.id,
-      phone_number: phoneNumber,
-      subtotal: subtotal,
-      totalPrice,
-      voucher_id: voucherId,
-      status: 1,
-      ship_method: 1,
-      payment_method: paymentMethodId,
-    };
-
-    try {
-      // Gửi yêu cầu thanh toán lên API (ví dụ sử dụng Redux action `postOrderPayment`)
-      await dispatch(postOrder(orderData));
-      if (payment_url && paymentMethod === 2) {
-      }
-      notification.success({
-        message: "Thanh toán thành công",
-        description:
-          "Cảm ơn bạn đã thanh toán. Đơn hàng của bạn đang được xử lý.",
-      });
-
-      // Đóng modal sau khi thanh toán thành công
-      setShowModal(false);
-    } catch (error: any) {
-      const errorMessage = error?.data?.message;
-      notification.error({
-        message: "Lỗi khi thanh toán",
-        description: errorMessage,
-        className: "order-sai",
-      });
-    }
-  };
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -261,6 +236,7 @@ const CheckoutComponent: React.FC = () => {
     const addressData = {
       user_id: userId,
       recipient_name: recipientName,
+      sender_name: senderName,
       is_default: true,
       ship_address: shipAddress,
       phone_number: phoneNumber,
@@ -270,31 +246,78 @@ const CheckoutComponent: React.FC = () => {
       const shipAddressResponse = await dispatch(
         postShipAddress(addressData)
       ).unwrap();
+      const refreshed = await getAddress();
+      // Nếu có địa chỉ mới, tự động điền vào form
+      if (refreshed && refreshed.data) {
+        setRecipientName(refreshed.data.recipient_name);
+        setSenderName(refreshed.data.sender_name || "");
+        setPhoneNumber(refreshed.data.phone_number);
+        setShipAddress(refreshed.data.ship_address);
+      } else if (isAddress && isAddress.data) {
+        setRecipientName(isAddress.data.recipient_name);
+        setSenderName(isAddress.data.sender_name || "");
+        setPhoneNumber(isAddress.data.phone_number);
+        setShipAddress(isAddress.data.ship_address);
+      }
+
+      const selectedIdsString = localStorage.getItem("selectedCartItems");
+      if (!selectedIdsString) {
+        message.error("Lỗi: Không tìm thấy sản phẩm đã chọn để đặt hàng.");
+        return;
+      }
 
       const orderData = {
-        user_id: userId,
-        total_amount: totalPrice,
-        ship_address_id: shipAddressResponse.id,
-        phone_number: phoneNumber,
-        subtotal: subtotal,
-        voucher_id: voucherId,
-        totalPrice,
-        status: 1,
-        ship_method: 1,
+        cart_item_ids: JSON.parse(selectedIdsString),
         payment_method: paymentMethodId,
+        voucher_id: voucherId,
+        ship_address_id: shipAddressResponse.id,
       };
 
-      const resultAction = await dispatch(postOrder(orderData)).unwrap();
-      if (paymentMethodId === 2 && resultAction.payment_url) {
-        window.location.href = resultAction.payment_url;
-      } else {
-      }
-      if (paymentMethodId === 1) {
-        window.location.href = "/order-success";
-      }
+      const response = await api.post(
+        "/orders/create-from-selection",
+        orderData
+      );
+      const resultAction = response.data;
 
-      localStorage.removeItem("cartItems");
+      if (paymentMethodId === 2 && resultAction.payment_url) {
+        // Online payment - redirect to VNPay
+        setPaymentLoading(true);
+        notification.info({
+          message: "Đang chuyển hướng đến trang thanh toán",
+          description: "Vui lòng chờ trong giây lát...",
+        });
+
+        setTimeout(() => {
+          if (resultAction.payment_url) {
+            localStorage.removeItem("selectedCartItems"); // Clear selection on redirect
+            window.location.href = resultAction.payment_url;
+          } else {
+            notification.error({
+              message: "Lỗi thanh toán",
+              description: "Không thể tạo URL thanh toán",
+            });
+            setPaymentLoading(false);
+          }
+        }, 1500);
+      } else if (paymentMethodId === 1) {
+        // COD payment successful - clear selection and redirect
+        localStorage.removeItem("selectedCartItems");
+        notification.success({
+          message: "Đặt hàng thành công",
+          description: "Đơn hàng của bạn đã được tạo thành công!",
+        });
+        window.location.href = "/order-success";
+      } else if (paymentMethodId === 2 && !resultAction.payment_url) {
+        // Handle online payment error where URL is not returned
+        notification.error({
+          message: "Lỗi thanh toán",
+          description: "Không thể tạo URL thanh toán. Vui lòng thử lại.",
+        });
+      }
     } catch (error: any) {
+      setPaymentLoading(false);
+      setPaymentError(error?.data?.message || "Có lỗi xảy ra khi thanh toán");
+      
       const errorMessage = error?.data?.message;
       notification.error({
         message: "Lỗi khi thanh toán",
@@ -376,6 +399,28 @@ const CheckoutComponent: React.FC = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Hiển thị lỗi thanh toán */}
+            {paymentError && (
+              <div className="alert alert-danger" role="alert">
+                <strong>Lỗi thanh toán:</strong> {paymentError}
+                <button 
+                  type="button" 
+                  className="btn-close" 
+                  onClick={() => setPaymentError(null)}
+                ></button>
+              </div>
+            )}
+            
+            {/* Loading thanh toán */}
+            {paymentLoading && (
+              <div className="text-center my-4">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">Đang xử lý...</span>
+                </div>
+                <p className="mt-2">Đang chuyển hướng đến trang thanh toán...</p>
+              </div>
+            )}
             <div className="box-table-cart box-form-checkout">
               <div className="row">
                 <div className="col-lg-7">
@@ -406,6 +451,52 @@ const CheckoutComponent: React.FC = () => {
                   )}
                   <div>
                     <div className="col-lg-6" style={{ width: "100%" }}>
+                        <div className="form-group">
+                          <label
+                            htmlFor=""
+                            style={{
+                              fontFamily: "Raleway",
+                              fontSize: "17px",
+                              fontWeight: "600",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            *Họ tên người nhận
+                          </label>
+                          <input
+                            className="form-control name-pla"
+                            type="text"
+                            placeholder="*Nhập họ tên của người nhận"
+                            name="recipient_name"
+                            value={recipientName}
+                            onChange={(e) => setRecipientName(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-lg-6" style={{ width: "100%" }}>
+                        <div className="form-group">
+                          <label
+                            htmlFor=""
+                            style={{
+                              fontFamily: "Raleway",
+                              fontSize: "17px",
+                              fontWeight: "600",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            *Họ tên người gửi
+                          </label>
+                          <input
+                            className="form-control name-pla"
+                            type="text"
+                            placeholder="*Nhập họ tên của người gửi"
+                            name="sender_name"
+                            value={senderName}
+                            onChange={(e) => setSenderName(e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    {/* <div className="col-lg-6" style={{ width: "100%" }}>
                       <div className="form-group">
                         <label
                           htmlFor=""
@@ -416,19 +507,18 @@ const CheckoutComponent: React.FC = () => {
                             marginBottom: "10px",
                           }}
                         >
-                          *Họ tên
+                          *Email
                         </label>
                         <input
                           className="form-control name-pla"
-                          type="text"
-                          placeholder="*Nhập họ tên của bạn"
-                          name="recipient_name"
-                          value={recipientName}
-                          onChange={(e) => setRecipientName(e.target.value)}
+                          type="email"
+                          placeholder="*Nhập thông tin email"
+                          name="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
                         />
                       </div>
-                    </div>
-
+                    </div> */}
                     <div className="col-lg-6" style={{ width: "100%" }}>
                       <div className="form-group name-pla">
                         <label
@@ -532,8 +622,8 @@ const CheckoutComponent: React.FC = () => {
                       <span className="font-xl-bold">Số lượng</span>
                       <span className="font-xl-bold">Giá</span>
                     </div>
-                    {cart?.items && cart.items.length > 0 ? (
-                      cart.items.map((item) => (
+                    {checkoutItems && checkoutItems.length > 0 ? (
+                      checkoutItems.map((item) => (
                         <div key={item.id} className="box-list-item-checkout">
                           <div className="item-checkout">
                             <span className="title-item">
@@ -544,7 +634,17 @@ const CheckoutComponent: React.FC = () => {
                               />
                             </span>
                             <span className="title-item">
-                              {item.product_name}
+                              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                                <div>{item.product_name}</div>
+                                <div style={{ display: "flex", gap: "8px", fontSize: "12px", color: "#666" }}>
+                                  {item.color && (
+                                    <span>Màu: <strong style={{ color: "#333" }}>{item.color}</strong></span>
+                                  )}
+                                  {item.size && (
+                                    <span>Size: <strong style={{ color: "#333" }}>{item.size}</strong></span>
+                                  )}
+                                </div>
+                              </div>
                             </span>
                             <span className="num-item">x{item.quantity}</span>
                             <span className="price-item font-md-bold">
@@ -562,25 +662,29 @@ const CheckoutComponent: React.FC = () => {
                     {/* Chọn mã giảm giá */}
                     <div className="box-footer-checkout">
                       <div className="form-group">
-                        {isVoucher?.length > 0 && (
-                          <div className="mb-3">
-                            <select
-                              className="chon-vou"
-                              onChange={handleVoucherChange}
-                              value={voucherId || ""}
-                            >
-                              <option value="" disabled>
-                                Chọn mã giảm giá
-                              </option>
-                              {isVoucher.map((voucher) => (
+                        <div className="mb-3">
+                          <select
+                            className="chon-vou"
+                            onChange={handleVoucherChange}
+                            value={voucherId || ""}
+                          >
+                            <option value="" disabled>
+                              Chọn mã giảm giá
+                            </option>
+                            {isVoucher && isVoucher.length > 0 ? (
+                              isVoucher.map((voucher) => (
                                 <option key={voucher.id} value={voucher.id}>
                                   {voucher.code} - Giảm{" "}
                                   {formatCurrency(voucher.discount_value)}
                                 </option>
-                              ))}
-                            </select>
-                          </div>
-                        )}
+                              ))
+                            ) : (
+                              <option value="" disabled>
+                                Không có mã giảm giá
+                              </option>
+                            )}
+                          </select>
+                        </div>
 
                         <div className="item-checkout justify-content-between">
                           <span className="font-xl-bold">Tạm tính</span>
@@ -590,16 +694,20 @@ const CheckoutComponent: React.FC = () => {
                         </div>
                         <div className="item-checkout justify-content-between">
                           <span className="font-sm">Phí ship</span>
-                          <span className="font-md-bold">Free</span>
+                          <span className="font-md-bold">
+                            {/* {(30000).toLocaleString("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            })} */}
+                            Free
+                          </span>
                         </div>
-                        {isVoucher?.length > 0 && (
-                          <div className="item-checkout justify-content-between">
-                            <span className="font-sm">Mã giảm giá</span>
-                            <span className="font-md-bold">
-                              {discount > 0 ? formatCurrency(discount) : "0"}
-                            </span>
-                          </div>
-                        )}
+                        <div className="item-checkout justify-content-between">
+                          <span className="font-sm">Mã giảm giá</span>
+                          <span className="font-md-bold">
+                            {discount > 0 ? `-${formatCurrency(discount)}` : "0"}
+                          </span>
+                        </div>
                         <div className="item-checkout justify-content-between">
                           <span className="font-xl-bold">Tổng cộng</span>
                           <span

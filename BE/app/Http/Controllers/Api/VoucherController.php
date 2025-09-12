@@ -43,11 +43,11 @@ class VoucherController extends Controller
             ->where('quantity', '>', 0) // Voucher còn số lượng
             ->where(function ($query) {
                 $query->whereNull('start_day')
-                    ->orWhere('start_day', '<=', now());
+                    ->orWhereDate('start_day', '<=', now());
             })
             ->where(function ($query) {
                 $query->whereNull('end_day')
-                    ->orWhere('end_day', '>=', now());
+                    ->orWhereDate('end_day', '>=', now());
             })
             ->get();
 
