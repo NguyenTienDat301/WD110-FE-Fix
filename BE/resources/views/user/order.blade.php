@@ -24,11 +24,11 @@
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <script src="{{ asset('js/realtime-user-orders.js') }}"></script>
     <script src="{{ asset('js/debug-user-realtime.js') }}"></script>
-    <h1 class="text-center mb-4">Danh sách Đơn hàng</h1>
+    <h1 class="text-center mb-4 text-primary fw-bold"><i class="fa fa-shopping-cart me-2"></i>Danh sách Đơn hàng</h1>
 
     <div class="container mt-2">
         <!-- Navigation Tabs for Filtering by Order Status -->
-        <ul class="nav nav-tabs">
+    <ul class="nav nav-tabs mb-4">
             <li class="nav-item"><a class="nav-link {{ request()->get('status') === null ? 'active' : '' }}"
                     href="{{ route('userorder.index') }}">Tất cả</a></li>
             <li class="nav-item"><a class="nav-link {{ request()->get('status') == 0 ? 'active' : '' }}"
@@ -47,22 +47,25 @@
 
         <!-- Order List -->
         @if ($orders->isEmpty())
-            <p class="text-center mt-4">Không có đơn hàng nào. Vui lòng mua sắm.</p>
+            <div class="alert alert-info text-center mt-4 p-4 rounded shadow-sm">
+                <i class="fa fa-box-open fa-2x mb-2"></i><br>
+                Không có đơn hàng nào. Vui lòng mua sắm.
+            </div>
         @else
             @foreach ($orders as $order)
-                <div class="card my-4 shadow-sm border-0" data-order-id="{{ $order->id }}" data-user-id="{{ $order->user_id }}">
-                    <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
-                        <span><strong>ID đơn hàng:</strong> #{{ $order->id }}</span>
-                        <p
-                            class="{{ $order->status == 3 ? 'text-success' : ($order->status == 4 ? 'text-danger' : 'text-muted') }}">
+                <div class="card my-4 shadow-lg border-0" data-order-id="{{ $order->id }}" data-user-id="{{ $order->user_id }}">
+                    <div class="card-header d-flex justify-content-between align-items-center py-3"
+                        style="background:
+                            {{ $order->status == 3 ? '#e6f9ed' : ($order->status == 4 ? '#fdeaea' : ($order->status == 2 ? '#eaf1fd' : '#f0f4f8')) }};">
+                        <span class="fw-bold text-secondary"><i class="fa fa-receipt me-2"></i>ID đơn hàng: #{{ $order->id }}</span>
+                        <span class="fw-bold {{ $order->status == 3 ? 'text-success' : ($order->status == 4 ? 'text-danger' : 'text-primary') }}">
                             {{ $order->message }}
-                        </p>
-                        <span
-                            class="badge
-                        @if ($order->status == 3) bg-success
-                        @elseif($order->status == 4) bg-danger
-                        @elseif($order->status == 2) bg-primary
-                        @else bg-info @endif">
+                        </span>
+                        <span class="badge px-3 py-2 fs-6
+                            @if ($order->status == 3) bg-success text-white
+                            @elseif($order->status == 4) bg-danger text-white
+                            @elseif($order->status == 2) bg-primary text-white
+                            @else bg-info text-dark @endif">
                             {{ $order->status == 2
                                 ? 'Đang vận chuyển'
                                 : ($order->status == 3
@@ -70,33 +73,32 @@
                                     : ($order->status == 4
                                         ? 'Đã hủy'
                                         : 'Đang xử lý')) }}
-
                         </span>
                     </div>
 
-                    <div class="card-body p-4">
+                    <div class="card-body p-4 bg-white">
                         <!-- Display Order Details -->
                         @php
                             $orderTotal = 0;
                         @endphp
                         @foreach ($order->orderDetails as $orderDetail)
-                            <div class="d-flex align-items-start mb-3">
+                            <div class="d-flex align-items-start mb-3 border-bottom pb-3">
                                     @if ($orderDetail->product)
                                         <a href="http://localhost:3000/product-detail/{{ $orderDetail->product->id }}">
                                             <img src="{{ Storage::url($orderDetail->product->img_thumb) }}" alt="{{ $orderDetail->product->name }}" class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
                                         </a>
                                         <div style="flex: 1;">
-                                            <h6 class="mb-1 fw-bold">{{ $orderDetail->product->name }}</h6>
-                                            <p class="mb-1 text-muted"><small>Danh mục: {{ $orderDetail->product->categories->name ?? 'Không rõ' }}</small></p>
-                                            <p class="mb-0 text-muted"><small>Số lượng: <strong>x{{ $orderDetail->quantity }}</strong></small></p>
+                                            <h6 class="mb-1 fw-bold text-primary">{{ $orderDetail->product->name }}</h6>
+                                            <p class="mb-1 text-muted"><i class="fa fa-list me-1"></i><small>Danh mục: {{ $orderDetail->product->categories->name ?? 'Không rõ' }}</small></p>
+                                            <p class="mb-0 text-muted"><i class="fa fa-sort-numeric-up me-1"></i><small>Số lượng: <strong>x{{ $orderDetail->quantity }}</strong></small></p>
                                         </div>
                                         <div style="flex: 1;" class="mt-4">
-                                            <p class="mb-1 text-muted"><small>Màu sắc: {{ $orderDetail->color->name_color ?? 'Không rõ' }}</small></p>
-                                            <p class="mb-0 text-muted"><small>Kích cỡ: {{ $orderDetail->size->size ?? 'Không rõ' }}</small></p>
+                                            <p class="mb-1 text-muted"><i class="fa fa-palette me-1"></i><small>Màu sắc: {{ $orderDetail->color->name_color ?? 'Không rõ' }}</small></p>
+                                            <p class="mb-0 text-muted"><i class="fa fa-ruler-combined me-1"></i><small>Kích cỡ: {{ $orderDetail->size->size ?? 'Không rõ' }}</small></p>
                                         </div>
                                         <div class="d-flex flex-column align-items-center" style="width: 100px;">
-                                            <p class="mb-0">Đơn giá:</p>
-                                            <p class="mb-0 fw-bold">
+                                            <p class="mb-0"><i class="fa fa-money-bill-wave me-1"></i>Đơn giá:</p>
+                                            <p class="mb-0 fw-bold text-success">
                                                 @if(isset($orderDetail->price) && $orderDetail->price > 0)
                                                     ₫{{ number_format($orderDetail->price, 0, ',', '.') }}
                                                 @else
@@ -105,7 +107,7 @@
                                             </p>
                                         </div>
                                         <div class="d-flex flex-column align-items-end" style="width: 120px;">
-                                            <p class="mb-0">Tổng:</p>
+                                            <p class="mb-0"><i class="fa fa-calculator me-1"></i>Tổng:</p>
                                             <p class="mb-0 text-danger fw-bold">₫{{ number_format($orderDetail->total, 0, ',', '.') }}</p>
                                         </div>
                                     @else
@@ -115,33 +117,28 @@
                                     @endif
                                 </div>
 
-                            <hr class="mt-3 mb-3">
+                            <!-- ...existing code... -->
                         @endforeach
 
                     </div>
 
                     <!-- Display Order Total -->
-                    <div class="card-footer bg-light d-flex justify-content-between align-items-center py-3">
+                    <div class="card-footer bg-light d-flex justify-content-between align-items-center py-3 border-top">
                         <div>
-                            <h6 class="m-0">Thành tiền: <span
-                                    class="fw-bold text-danger">₫{{ number_format($order->total_amount ?? 0) }}</span></h6>
-                            <h6 class="mt-1">Đã giảm giá:
-                                <span class="text-warning">
-                                    {{ number_format($order->discount_value ?? 0) }} VNĐ
-                                </span>
-                            </h6>
-                            <p class="mt-2 mb-0">Đã tạo lúc: <span style="color: green">{{ $order->created_at }}</span></p>
+                            <h6 class="m-0">Thành tiền: <span class="fw-bold text-danger">₫{{ number_format($order->total_amount ?? 0) }}</span></h6>
+                            <h6 class="mt-1">Đã giảm giá: <span class="fw-bold text-warning">{{ number_format($order->discount_value ?? 0) }} VNĐ</span></h6>
+                            <p class="mt-2 mb-0">Đã tạo lúc: <span class="fw-bold text-success">{{ $order->created_at }}</span></p>
                         </div>
                         <div>
-                            <a href="{{ route('userorder.show', $order->id) }}" class="btn btn-outline-info btn-sm me-2">Xem chi tiết</a>
+                            <a href="{{ route('userorder.show', $order->id) }}" class="btn btn-info btn-sm me-2 text-white"><i class="fa fa-eye me-1"></i>Xem chi tiết</a>
                             <span class="cancel-button-wrapper">
                                 @if ($order->status == 0)
                                     <!-- Only show cancel button if order is Pending -->
-                                    <button class="btn btn-outline-danger btn-sm me-2" data-bs-toggle="modal"
-                                        data-bs-target="#cancelOrderModal-{{ $order->id }}">Hủy Đơn Hàng</button>
+                                    <button class="btn btn-danger btn-sm me-2" data-bs-toggle="modal"
+                                        data-bs-target="#cancelOrderModal-{{ $order->id }}"><i class="fa fa-times me-1"></i>Hủy Đơn Hàng</button>
                                 @elseif ($order->status == 1)
-                                    <button class="btn btn-outline-secondary btn-sm me-2" disabled data-bs-toggle="tooltip"
-                                        title="Không thể hủy khi đơn hàng đã được xử lý">Hủy Đơn Hàng</button>
+                                    <button class="btn btn-secondary btn-sm me-2" disabled data-bs-toggle="tooltip"
+                                        title="Không thể hủy khi đơn hàng đã được xử lý"><i class="fa fa-ban me-1"></i>Hủy Đơn Hàng</button>
                                 @endif
                             </span>
 
@@ -155,11 +152,11 @@
                                     $reviewExists = \App\Models\Review::where('order_id', $order->id)->exists();
                                 @endphp
                                 @if ($reviewExists)
-                                    <button class="btn btn-outline-warning btn-sm me-2"
-                                        onclick="alert('Bạn đã đánh giá đơn hàng này rồi.')">Đã đánh giá</button>
+                                    <button class="btn btn-warning btn-sm me-2 text-white"
+                                        onclick="alert('Bạn đã đánh giá đơn hàng này rồi.')"><i class="fa fa-star me-1"></i>Đã đánh giá</button>
                                 @else
-                                    <button class="btn btn-outline-warning btn-sm me-2" data-bs-toggle="modal"
-                                        data-bs-target="#reviewModal-{{ $order->id }}">Đánh giá</button>
+                                    <button class="btn btn-warning btn-sm me-2 text-white" data-bs-toggle="modal"
+                                        data-bs-target="#reviewModal-{{ $order->id }}"><i class="fa fa-star me-1"></i>Đánh giá</button>
                                 @endif
                             @endif
                         </div>
