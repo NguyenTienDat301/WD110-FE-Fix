@@ -9,18 +9,30 @@ use Illuminate\Support\Facades\Auth;
 class UservoucherController extends Controller
 {
     public function index()
-{
-    $userId = Auth::id(); // Lấy ID người dùng đang đăng nhập
+    {
+        $userId = Auth::id();
+        $now = now();
+        // Voucher có thể sử dụng: đang active, chưa dùng, còn hạn
+        $usableVouchers = Voucher::where('is_active', 1)
+            ->where('start_day', '<=', $now)
+            ->where('end_day', '>=', $now)
+            ->whereDoesntHave('voucherUsages', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            })
+            ->paginate(8);
 
-    // Lấy danh sách voucher chưa được người dùng sử dụng
-    $vouchers = Voucher::where('is_active', 1)
-        ->whereDoesntHave('voucherUsages', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })
-        ->paginate(5);
+        // Voucher không thể sử dụng: đã dùng, hết hạn, không active
+        $unusableVouchers = Voucher::where(function($query) use ($userId, $now) {
+                $query->where('is_active', 0)
+                    ->orWhere('end_day', '<', $now)
+                    ->orWhereHas('voucherUsages', function ($q) use ($userId) {
+                        $q->where('user_id', $userId);
+                    });
+            })
+            ->paginate(8);
 
-    return view('user.voucher', compact('vouchers'));
-}
+        return view('user.voucher', compact('usableVouchers', 'unusableVouchers'));
+    }
 
 
     }

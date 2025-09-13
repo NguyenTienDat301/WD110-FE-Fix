@@ -16,14 +16,15 @@ class UserController extends Controller
 
     public function user(Request $request)
     {
+        if (Auth::check() && Auth::user()->role == 1) {
+            return redirect()->route('admin.dashboard');
+        }
         $token = $request->cookie('token');
-    
         // Nếu token có định dạng "ID|token", chỉ lấy phần token
         if ($token && strpos($token, '|') !== false) {
             $tokenParts = explode('|', $token);
             $token = end($tokenParts); // Lấy phần sau dấu '|'
         }
-    
         return view('user.dashboard', ['token' => $token]);
     }
 
