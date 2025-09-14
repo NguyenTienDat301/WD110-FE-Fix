@@ -5,7 +5,10 @@
 @section('content')
 <div class="container mt-4">
 
-    <h4 class="mb-4">Danh sách Voucher</h4>
+    <h1 class="display-5 fw-bold text-primary mb-4 d-flex align-items-center gap-3">
+        <i class="bi bi-ticket-perforated-fill" style="font-size: 1.5rem; color: #0d6efd;"></i>
+        Danh sách Voucher
+    </h1>
 
     {{-- Form tìm kiếm chung cho cả 2 bảng --}}
     <div class="row mb-4">
