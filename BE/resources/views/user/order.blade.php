@@ -1,311 +1,320 @@
 @extends('user.master')
 
-@section('title')
-    Danh sách Đơn hàng
-@endsection
+@section('title', 'Danh sách Đơn hàng')
 
 @section('content')
-    <!-- CSRF Token and User ID for AJAX requests -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="user-id" content="{{ $orders->first()->user_id ?? auth()->id() }}">
-    <script>
-        // Force cache refresh
-        console.log('🔍 Debug: User ID from meta:', '{{ $orders->first()->user_id ?? auth()->id() }}');
-        console.log('🔍 Debug: Auth ID:', '{{ auth()->id() }}');
-        console.log('🔍 Debug: First order user ID:', '{{ $orders->first()->user_id ?? "no orders" }}');
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="user-id" content="{{ $orders->first()->user_id ?? auth()->id() }}">
 
-        // Set user ID globally
-        window.CURRENT_USER_ID = '{{ $orders->first()->user_id ?? auth()->id() }}';
-        console.log('🔍 Debug: Global user ID set:', window.CURRENT_USER_ID);
-    </script>
+<script>
+    window.CURRENT_USER_ID = '{{ $orders->first()->user_id ?? auth()->id() }}';
+    console.log('Global User ID:', window.CURRENT_USER_ID);
+</script>
 
-    <!-- Include realtime CSS and JavaScript -->
-    <link rel="stylesheet" href="{{ asset('css/realtime-orders.css') }}">
-    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
-    <script src="{{ asset('js/realtime-user-orders.js') }}"></script>
-    <script src="{{ asset('js/debug-user-realtime.js') }}"></script>
-    <h1 class="text-center mb-4 text-primary fw-bold"><i class="fa fa-shopping-cart me-2"></i>Danh sách Đơn hàng</h1>
+<!-- Styles -->
+<link rel="stylesheet" href="{{ asset('css/realtime-orders.css') }}">
 
-    <div class="container mt-2">
-        <!-- Navigation Tabs for Filtering by Order Status -->
-    <ul class="nav nav-tabs mb-4">
-            <li class="nav-item"><a class="nav-link {{ request()->get('status') === null ? 'active' : '' }}"
-                    href="{{ route('userorder.index') }}">Tất cả</a></li>
-            <li class="nav-item"><a class="nav-link {{ request()->get('status') == 0 ? 'active' : '' }}"
-                    href="{{ route('userorder.index', ['status' => 0]) }}">Chờ Xử lí</a></li>
-            <li class="nav-item"><a class="nav-link {{ request()->get('status') == 1 ? 'active' : '' }}"
-                    href="{{ route('userorder.index', ['status' => 1]) }}">Đã xử lý</a></li>
-            <li class="nav-item"><a class="nav-link {{ request()->get('status') == 2 ? 'active' : '' }}"
-                    href="{{ route('userorder.index', ['status' => 2]) }}">Vận chuyển</a></li>
-            <li class="nav-item"><a class="nav-link {{ request()->get('status') == 3 ? 'active' : '' }}"
-                    href="{{ route('userorder.index', ['status' => 3]) }}">Hoàn thành</a></li>
-            <li class="nav-item"><a class="nav-link {{ request()->get('status') == 4 ? 'active' : '' }}"
-                    href="{{ route('userorder.index', ['status' => 4]) }}">Đã hủy</a></li>
-            {{-- <li class="nav-item"><a class="nav-link {{ request()->get('status') == 5 ? 'active' : '' }}"
-                    href="{{ route('userorder.index', ['status' => 5]) }}">Trả hàng/Hoàn tiền</a></li> --}}
-        </ul>
+<!-- External JS -->
+<script src="https://js.pusher.com/8.2.0/pusher.min.js" defer></script>
+<script src="{{ asset('js/realtime-user-orders.js') }}" defer></script>
+<script src="{{ asset('js/debug-user-realtime.js') }}" defer></script>
 
-        <!-- Order List -->
-        @if ($orders->isEmpty())
-            <div class="alert alert-info text-center mt-4 p-4 rounded shadow-sm">
-                <i class="fa fa-box-open fa-2x mb-2"></i><br>
-                Không có đơn hàng nào. Vui lòng mua sắm.
-            </div>
-        @else
-            @foreach ($orders as $order)
-                <div class="card my-4 shadow-lg border-0" data-order-id="{{ $order->id }}" data-user-id="{{ $order->user_id }}">
-                    <div class="card-header d-flex justify-content-between align-items-center py-3"
-                        style="background:
-                            {{ $order->status == 3 ? '#e6f9ed' : ($order->status == 4 ? '#fdeaea' : ($order->status == 2 ? '#eaf1fd' : '#f0f4f8')) }};">
-                        <span class="fw-bold text-secondary"><i class="fa fa-receipt me-2"></i>ID đơn hàng: #{{ $order->id }}</span>
-                        <span class="fw-bold {{ $order->status == 3 ? 'text-success' : ($order->status == 4 ? 'text-danger' : 'text-primary') }}">
-                            {{ $order->message }}
-                        </span>
-                        <span class="badge px-3 py-2 fs-6
-                            @if ($order->status == 3) bg-success text-white
-                            @elseif($order->status == 4) bg-danger text-white
-                            @elseif($order->status == 2) bg-primary text-white
-                            @else bg-info text-dark @endif">
-                            {{ $order->status == 2
-                                ? 'Đang vận chuyển'
-                                : ($order->status == 3
-                                    ? 'Giao hàng thành công'
-                                    : ($order->status == 4
-                                        ? 'Đã hủy'
-                                        : 'Đang xử lý')) }}
-                        </span>
-                    </div>
+<div class="container my-5">
+    <h1 class="text-center mb-5 text-primary fw-bold">
+        <i class="fa fa-shopping-cart me-2"></i>Danh sách Đơn hàng
+    </h1>
 
-                    <div class="card-body p-4 bg-white">
-                        <!-- Display Order Details -->
-                        @php
-                            $orderTotal = 0;
-                        @endphp
-                        @foreach ($order->orderDetails as $orderDetail)
-                            <div class="d-flex align-items-start mb-3 border-bottom pb-3">
-                                    @if ($orderDetail->product)
-                                        <a href="http://localhost:3000/product-detail/{{ $orderDetail->product->id }}">
-                                            <img src="{{ Storage::url($orderDetail->product->img_thumb) }}" alt="{{ $orderDetail->product->name }}" class="rounded me-3" style="width: 80px; height: 80px; object-fit: cover;">
-                                        </a>
-                                        <div style="flex: 1;">
-                                            <h6 class="mb-1 fw-bold text-primary">{{ $orderDetail->product->name }}</h6>
-                                            <p class="mb-1 text-muted"><i class="fa fa-list me-1"></i><small>Danh mục: {{ $orderDetail->product->categories->name ?? 'Không rõ' }}</small></p>
-                                            <p class="mb-0 text-muted"><i class="fa fa-sort-numeric-up me-1"></i><small>Số lượng: <strong>x{{ $orderDetail->quantity }}</strong></small></p>
-                                        </div>
-                                        <div style="flex: 1;" class="mt-4">
-                                            <p class="mb-1 text-muted"><i class="fa fa-palette me-1"></i><small>Màu sắc: {{ $orderDetail->color->name_color ?? 'Không rõ' }}</small></p>
-                                            <p class="mb-0 text-muted"><i class="fa fa-ruler-combined me-1"></i><small>Kích cỡ: {{ $orderDetail->size->size ?? 'Không rõ' }}</small></p>
-                                        </div>
-                                        <div class="d-flex flex-column align-items-center" style="width: 100px;">
-                                            <p class="mb-0"><i class="fa fa-money-bill-wave me-1"></i>Đơn giá:</p>
-                                            <p class="mb-0 fw-bold text-success">
-                                                @if(isset($orderDetail->price) && $orderDetail->price > 0)
-                                                    ₫{{ number_format($orderDetail->price, 0, ',', '.') }}
-                                                @else
-                                                    <span class="text-danger">Không có</span>
-                                                @endif
-                                            </p>
-                                        </div>
-                                        <div class="d-flex flex-column align-items-end" style="width: 120px;">
-                                            <p class="mb-0"><i class="fa fa-calculator me-1"></i>Tổng:</p>
-                                            <p class="mb-0 text-danger fw-bold">₫{{ number_format($orderDetail->total, 0, ',', '.') }}</p>
-                                        </div>
-                                    @else
-                                        <div class="d-flex align-items-center">
-                                            <p class="text-danger" style="color:red;">Sản phẩm đã bị xóa bởi hệ thống </p>
-                                        </div>
-                                    @endif
+    {{-- Navigation Tabs --}}
+    <ul class="nav nav-tabs justify-content-center mb-5" role="tablist">
+        @php
+            $statusTabs = [
+                null => 'Tất cả',
+                0 => 'Chờ Xử lí',
+                1 => 'Đã xử lý',
+                2 => 'Vận chuyển',
+                3 => 'Hoàn thành',
+                4 => 'Đã hủy',
+                //5 => 'Trả hàng/Hoàn tiền', // Uncomment if needed
+            ];
+            $currentStatus = request()->get('status');
+        @endphp
+
+        @foreach ($statusTabs as $key => $label)
+            <li class="nav-item" role="presentation">
+                <a 
+                    class="nav-link {{ (string)$currentStatus === (string)$key ? 'active' : '' }}" 
+                    href="{{ route('userorder.index', $key !== null ? ['status' => $key] : []) }}" 
+                    role="tab"
+                >
+                    {{ $label }}
+                </a>
+            </li>
+        @endforeach
+    </ul>
+
+    {{-- Orders List --}}
+    @if ($orders->isEmpty())
+        <div class="alert alert-info text-center py-5 rounded shadow-sm">
+            <i class="fa fa-box-open fa-3x mb-3"></i><br>
+            <h4>Không có đơn hàng nào.</h4>
+            <p>Hãy tiếp tục mua sắm để tạo đơn hàng mới!</p>
+        </div>
+    @else
+        @foreach ($orders as $order)
+            @php
+                // Badge & color mappings
+                $statusColor = match ($order->status) {
+                    3 => ['bg' => 'bg-success', 'text' => 'text-white', 'label' => 'Giao hàng thành công', 'headerBg' => '#e6f9ed'],
+                    4 => ['bg' => 'bg-danger', 'text' => 'text-white', 'label' => 'Đã hủy', 'headerBg' => '#fdeaea'],
+                    2 => ['bg' => 'bg-primary', 'text' => 'text-white', 'label' => 'Đang vận chuyển', 'headerBg' => '#eaf1fd'],
+                    default => ['bg' => 'bg-info', 'text' => 'text-dark', 'label' => 'Đang xử lý', 'headerBg' => '#f0f4f8'],
+                };
+            @endphp
+
+            <div class="card shadow-sm mb-4 border-0" data-order-id="{{ $order->id }}" data-user-id="{{ $order->user_id }}">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: {{ $statusColor['headerBg'] }};">
+                    <span class="fw-bold text-secondary"><i class="fa fa-receipt me-2"></i>ID đơn hàng: #{{ $order->id }}</span>
+                    <span class="fw-semibold {{ $order->status == 3 ? 'text-success' : ($order->status == 4 ? 'text-danger' : 'text-primary') }}">
+                        {{ $order->message }}
+                    </span>
+                    <span class="badge {{ $statusColor['bg'] }} {{ $statusColor['text'] }} px-3 py-2 fs-6 rounded-pill">
+                        {{ $statusColor['label'] }}
+                    </span>
+                </div>
+
+                <div class="card-body bg-white">
+                    @foreach ($order->orderDetails as $detail)
+                        <div class="d-flex align-items-center mb-4 border-bottom pb-3 gap-3">
+                            @if ($detail->product)
+                                <a href="{{ url('/product-detail/' . $detail->product->id) }}" class="d-block flex-shrink-0" style="width: 90px; height: 90px;">
+                                    <img src="{{ Storage::url($detail->product->img_thumb) }}" alt="{{ $detail->product->name }}" class="img-fluid rounded" style="object-fit: cover; width: 100%; height: 100%;">
+                                </a>
+                                <div class="flex-grow-1 d-flex flex-column justify-content-center">
+                                    <h5 class="fw-bold text-primary mb-1">{{ $detail->product->name }}</h5>
+                                    <small class="text-muted"><i class="fa fa-list me-1"></i>Danh mục: {{ $detail->product->categories->name ?? 'Không rõ' }}</small>
+                                    <small class="text-muted"><i class="fa fa-palette me-1"></i>Màu: {{ $detail->color->name_color ?? 'Không rõ' }}</small>
+                                    <small class="text-muted"><i class="fa fa-ruler-combined me-1"></i>Kích cỡ: {{ $detail->size->size ?? 'Không rõ' }}</small>
+                                    <small class="text-muted"><i class="fa fa-sort-numeric-up me-1"></i>Số lượng: <strong>x{{ $detail->quantity }}</strong></small>
                                 </div>
-
-                            <!-- ...existing code... -->
-                        @endforeach
-
-                    </div>
-
-                    <!-- Display Order Total -->
-                    <div class="card-footer bg-light d-flex justify-content-between align-items-center py-3 border-top">
-                        <div>
-                            <h6 class="m-0">Thành tiền: <span class="fw-bold text-danger">₫{{ number_format($order->total_amount ?? 0) }}</span></h6>
-                            <h6 class="mt-1">Đã giảm giá: <span class="fw-bold text-warning">{{ number_format($order->discount_value ?? 0) }} VNĐ</span></h6>
-                            <p class="mt-2 mb-0">Đã tạo lúc: <span class="fw-bold text-success">{{ $order->created_at }}</span></p>
-                        </div>
-                        <div>
-                            <a href="{{ route('userorder.show', $order->id) }}" class="btn btn-info btn-sm me-2 text-white"><i class="fa fa-eye me-1"></i>Xem chi tiết</a>
-                            <span class="cancel-button-wrapper">
-                                @if ($order->status == 0)
-                                    <!-- Only show cancel button if order is Pending -->
-                                    <button class="btn btn-danger btn-sm me-2" data-bs-toggle="modal"
-                                        data-bs-target="#cancelOrderModal-{{ $order->id }}"><i class="fa fa-times me-1"></i>Hủy Đơn Hàng</button>
-                                @elseif ($order->status == 1)
-                                    <button class="btn btn-secondary btn-sm me-2" disabled data-bs-toggle="tooltip"
-                                        title="Không thể hủy khi đơn hàng đã được xử lý"><i class="fa fa-ban me-1"></i>Hủy Đơn Hàng</button>
-                                @endif
-                            </span>
-
-                            @if ($order->status == 2)
-                                <!-- Nút "Đã nhận hàng" đã bị ẩn theo yêu cầu -->
-                                {{-- <button class="btn btn-outline-success btn-sm me-2" data-bs-toggle="modal"
-                                    data-bs-target="#confirmReceiptModal-{{ $order->id }}">Đã nhận hàng</button> --}}
-                            @elseif($order->status == 3)
-                                <!-- Show "Đánh giá" button when order is "Hoàn thành" -->
-                                @php
-                                    $reviewExists = \App\Models\Review::where('order_id', $order->id)->exists();
-                                @endphp
-                                @if ($reviewExists)
-                                    <button class="btn btn-warning btn-sm me-2 text-white"
-                                        onclick="alert('Bạn đã đánh giá đơn hàng này rồi.')"><i class="fa fa-star me-1"></i>Đã đánh giá</button>
-                                @else
-                                    <button class="btn btn-warning btn-sm me-2 text-white" data-bs-toggle="modal"
-                                        data-bs-target="#reviewModal-{{ $order->id }}"><i class="fa fa-star me-1"></i>Đánh giá</button>
-                                @endif
+                                <div class="text-end" style="min-width: 140px;">
+                                    <div><small class="d-block mb-1"><i class="fa fa-money-bill-wave me-1"></i>Đơn giá:</small>
+                                        @if (isset($detail->price) && $detail->price > 0)
+                                            <span class="fw-bold text-success">₫{{ number_format($detail->price, 0, ',', '.') }}</span>
+                                        @else
+                                            <span class="text-danger">Không có</span>
+                                        @endif
+                                    </div>
+                                    <div><small class="d-block mb-1"><i class="fa fa-calculator me-1"></i>Tổng:</small>
+                                        <span class="fw-bold text-danger">₫{{ number_format($detail->total, 0, ',', '.') }}</span>
+                                    </div>
+                                </div>
+                            @else
+                                <div class="text-danger fw-semibold">Sản phẩm đã bị xóa bởi hệ thống</div>
                             @endif
                         </div>
-                    </div>
+                    @endforeach
                 </div>
 
-                <!-- Confirm Receipt Modal -->
-                <div class="modal fade" id="confirmReceiptModal-{{ $order->id }}" tabindex="-1"
-                    aria-labelledby="confirmReceiptModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center border-top py-3 flex-wrap gap-3">
+                    <div>
+                        <h5 class="mb-1">Thành tiền: <span class="text-danger fw-bold fs-5">₫{{ number_format($order->total_amount ?? 0, 0, ',', '.') }}</span></h5>
+                        <p class="mb-1 text-warning fw-semibold">Đã giảm giá: {{ number_format($order->discount_value ?? 0, 0, ',', '.') }} VNĐ</p>
+                        <small class="text-success">Đã tạo lúc: {{ $order->created_at->format('d/m/Y H:i') }}</small>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ route('userorder.show', $order->id) }}" class="btn btn-info btn-sm text-white d-flex align-items-center gap-1">
+                            <i class="fa fa-eye"></i> Xem chi tiết
+                        </a>
+
+                        @if ($order->status == 0)
+                            <button class="btn btn-danger btn-sm d-flex align-items-center gap-1" data-bs-toggle="modal" data-bs-target="#cancelOrderModal-{{ $order->id }}">
+                                <i class="fa fa-times"></i> Hủy Đơn Hàng
+                            </button>
+                        @elseif ($order->status == 1)
+                            <button class="btn btn-secondary btn-sm d-flex align-items-center gap-1" disabled data-bs-toggle="tooltip" title="Không thể hủy khi đơn hàng đã được xử lý">
+                                <i class="fa fa-ban"></i> Hủy Đơn Hàng
+                            </button>
+                        @endif
+
+                        {{-- Đã nhận hàng (bị ẩn theo yêu cầu)
+                        @if ($order->status == 2)
+                            <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#confirmReceiptModal-{{ $order->id }}">
+                                Đã nhận hàng
+                            </button>
+                        @endif --}}
+
+                        @if ($order->status == 3)
+                            @php
+                                $reviewExists = \App\Models\Review::where('order_id', $order->id)->exists();
+                            @endphp
+                            @if ($reviewExists)
+                                <button class="btn btn-warning btn-sm text-white" onclick="alert('Bạn đã đánh giá đơn hàng này rồi.')">
+                                    <i class="fa fa-star"></i> Đã đánh giá
+                                </button>
+                            @else
+                                <button class="btn btn-warning btn-sm text-white" data-bs-toggle="modal" data-bs-target="#reviewModal-{{ $order->id }}">
+                                    <i class="fa fa-star"></i> Đánh giá
+                                </button>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+            {{-- Cancel Order Modal --}}
+            <div class="modal fade" id="cancelOrderModal-{{ $order->id }}" tabindex="-1" aria-labelledby="cancelOrderModalLabel-{{ $order->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <form action="{{ route('userorder.update', $order->id) }}" method="POST" class="needs-validation" novalidate>
+                            @csrf
+                            @method('PATCH')
                             <div class="modal-header">
-                                <h5 class="modal-title" id="confirmReceiptModalLabel">Xác nhận đã nhận hàng</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                                <h5 class="modal-title" id="cancelOrderModalLabel-{{ $order->id }}">Lý do hủy đơn hàng</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                             </div>
-                            <form action="{{ route('done', $order->id) }}" method="POST">
-                                @csrf
-                                @method('PATCH')
-                                <div class="modal-body">
-                                    <p>Bạn có chắc chắn đã nhận hàng và muốn hoàn thành đơn hàng này?</p>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="cancelReason-{{ $order->id }}" class="form-label">Chọn lý do hủy đơn hàng:</label>
+                                    <select class="form-select" id="cancelReason-{{ $order->id }}" name="cancel_reason" required>
+                                        <option value="" disabled selected>-- Chọn lý do --</option>
+                                        <option value="Tôi không muốn đặt hàng nữa">Tôi không muốn đặt hàng nữa</option>
+                                        <option value="Mặt hàng quá đắt">Mặt hàng quá đắt</option>
+                                        <option value="Thời gian giao hàng quá lâu">Thời gian giao hàng quá lâu</option>
+                                        <option value="Other">Khác</option>
+                                    </select>
+                                    <div class="invalid-feedback">
+                                        Vui lòng chọn lý do hủy đơn hàng.
+                                    </div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                    <button type="submit" class="btn btn-success">Xác nhận</button>
+                                <div class="mb-3 d-none" id="otherReasonInput-{{ $order->id }}">
+                                    <label for="otherReason-{{ $order->id }}" class="form-label">Nhập lý do khác:</label>
+                                    <input type="text" class="form-control" id="otherReason-{{ $order->id }}" name="other_reason" maxlength="255" placeholder="Nhập lý do của bạn">
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-danger">Xác nhận hủy đơn</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
+            </div>
 
-
-                <!-- Cancel Order Modal -->
-                <div class="modal fade" id="cancelOrderModal-{{ $order->id }}" tabindex="-1"
-                    aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
+            {{-- Review Modal --}}
+            <div class="modal fade" id="reviewModal-{{ $order->id }}" tabindex="-1" aria-labelledby="reviewModalLabel-{{ $order->id }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <form action="{{ route('review.store', $order->id) }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            @csrf
                             <div class="modal-header">
-                                <h5 class="modal-title" id="cancelOrderModalLabel">Lý do hủy đơn hàng</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
+                                <h5 class="modal-title" id="reviewModalLabel-{{ $order->id }}">Đánh giá Đơn Hàng</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
                             </div>
-                            <form action="{{ route('userorder.update', $order->id) }}" method="POST">
-                                @csrf
-                                @method('PATCH')
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="cancelReason" class="form-label">Chọn lý do hủy đơn hàng:</label>
-                                        <select class="form-select" id="cancelReason" name="cancel_reason" required>
-                                            <option value="Tôi không muốn đặt hàng nữa">Tôi không muốn đặt hàng nữa
-                                            </option>
-                                            <option value="Mặt hàng quá đắt">Mặt hàng quá đắt</option>
-                                            <option value="Thời gian giao hàng quá lâu">Thời gian giao hàng quá lâu
-                                            </option>
-                                            <option value="Other">Khác</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3" id="otherReasonInput" style="display: none;">
-                                        <label for="otherReason" class="form-label">Nhập lý do khác:</label>
-                                        <input type="text" class="form-control" id="otherReason" name="other_reason">
-                                    </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="rating-{{ $order->id }}" class="form-label">Đánh giá sao:</label>
+                                    <select name="rating" id="rating-{{ $order->id }}" class="form-select" required>
+                                        <option value="" disabled>Chọn số sao</option>
+                                        @for ($i = 1; $i <= 5; $i++)
+                                            <option value="{{ $i }}" {{ $i == 5 ? 'selected' : '' }}>{{ $i }} Sao</option>
+                                        @endfor
+                                    </select>
+                                    <div class="invalid-feedback">Vui lòng chọn đánh giá sao.</div>
                                 </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                    <button type="submit" class="btn btn-danger">Hủy Đơn Hàng</button>
+
+                                <div class="mb-3">
+                                    <label for="comment-{{ $order->id }}" class="form-label">Bình luận:</label>
+                                    <textarea name="comment" id="comment-{{ $order->id }}" class="form-control" rows="4" maxlength="1000" placeholder="Viết bình luận của bạn..."></textarea>
                                 </div>
-                            </form>
-                        </div>
+
+                                <div class="mb-3">
+                                    <label for="image-{{ $order->id }}" class="form-label">Ảnh minh họa (nếu có):</label>
+                                    <input type="file" name="image" id="image-{{ $order->id }}" class="form-control" accept="image/*" />
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                <button type="submit" class="btn btn-primary">Gửi Đánh Giá</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
+            </div>
+        @endforeach
+    @endif
 
-                <!-- Review Modal -->
-                <div class="modal fade" id="reviewModal-{{ $order->id }}" tabindex="-1"
-                    aria-labelledby="reviewModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="reviewModalLabel">Đánh giá Đơn Hàng</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <form action="{{ route('review.store', $order->id) }}" method="POST"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <div class="modal-body">
-                                    <div class="mb-3">
-                                        <label for="rating" class="form-label">Đánh giá sao:</label>
-                                        <select name="rating" id="rating" class="form-select" required>
-                                            <option value="1">1 Sao</option>
-                                            <option value="2">2 Sao</option>
-                                            <option value="3">3 Sao</option>
-                                            <option value="4">4 Sao</option>
-                                            <option value="5" selected>5 Sao</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="comment" class="form-label">Bình luận:</label>
-                                        <textarea name="comment" id="comment" class="form-control" rows="4" maxlength="1000"></textarea>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="image" class="form-label">Ảnh minh họa (nếu có):</label>
-                                        <input type="file" name="image" id="image" class="form-control"
-                                            accept="image/*">
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                    <button type="submit" class="btn btn-primary">Gửi Đánh Giá</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        @endif
-    </div>
-
-    <div class="d-flex justify-content-center mt-4">
+    {{-- Pagination --}}
+    <div class="d-flex justify-content-center mt-5">
         {{ $orders->appends(['status' => request()->get('status')])->links() }}
     </div>
+</div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Handle "Other" reason toggle for all cancel modals
+        @foreach ($orders as $order)
+            const select{{ $order->id }} = document.getElementById('cancelReason-{{ $order->id }}');
+            const otherInput{{ $order->id }} = document.getElementById('otherReasonInput-{{ $order->id }}');
 
-    <script>
-        // JavaScript to handle the "Other" cancel reason
-        document.addEventListener('DOMContentLoaded', function() {
-            const cancelReasonSelect = document.getElementById('cancelReason');
-            const otherReasonInput = document.getElementById('otherReasonInput');
-
-            cancelReasonSelect.addEventListener('change', function() {
-                if (this.value === 'Other') {
-                    otherReasonInput.style.display = 'block'; // Show the other reason input
-                } else {
-                    otherReasonInput.style.display = 'none'; // Hide the other reason input
-                }
-            });
-
-            // Optional: You can set a listener to reset the "Other" input when modal is closed
-            const cancelOrderModal = document.querySelectorAll('.modal');
-            cancelOrderModal.forEach(function(modal) {
-                modal.addEventListener('hidden.bs.modal', function() {
-                    otherReasonInput.style.display =
-                        'none'; // Reset the display of the other reason field when modal is closed
-                    cancelReasonSelect.value = ''; // Reset the select value
-                    document.getElementById('otherReason').value =
-                        ''; // Clear the "Other" reason text field
+            if (select{{ $order->id }}) {
+                select{{ $order->id }}.addEventListener('change', function() {
+                    if (this.value === 'Other') {
+                        otherInput{{ $order->id }}.classList.remove('d-none');
+                        otherInput{{ $order->id }}.querySelector('input').setAttribute('required', 'required');
+                    } else {
+                        otherInput{{ $order->id }}.classList.add('d-none');
+                        const input = otherInput{{ $order->id }}.querySelector('input');
+                        input.removeAttribute('required');
+                        input.value = '';
+                        input.classList.remove('is-invalid');
+                    }
+                    this.classList.remove('is-invalid');
                 });
-            });
+            }
+
+            // Bootstrap form validation on submit
+            const formCancel{{ $order->id }} = document.querySelector('#cancelOrderModal-{{ $order->id }} form');
+            if (formCancel{{ $order->id }}) {
+                formCancel{{ $order->id }}.addEventListener('submit', function(e) {
+                    if (!this.checkValidity()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    this.classList.add('was-validated');
+                });
+            }
+
+            // Reset modal on close
+            const modalCancel{{ $order->id }} = document.getElementById('cancelOrderModal-{{ $order->id }}');
+            if (modalCancel{{ $order->id }}) {
+                modalCancel{{ $order->id }}.addEventListener('hidden.bs.modal', function () {
+                    const form = this.querySelector('form');
+                    form.reset();
+                    form.classList.remove('was-validated');
+                    otherInput{{ $order->id }}.classList.add('d-none');
+                });
+            }
+
+            // Review modal validation (optional)
+            const formReview{{ $order->id }} = document.querySelector('#reviewModal-{{ $order->id }} form');
+            if (formReview{{ $order->id }}) {
+                formReview{{ $order->id }}.addEventListener('submit', function(e) {
+                    if (!this.checkValidity()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                    this.classList.add('was-validated');
+                });
+            }
+
+        @endforeach
+
+        // Initialize Bootstrap tooltips for disabled buttons
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('button[disabled][data-bs-toggle="tooltip"]'))
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl)
         });
-    </script>
+    });
+</script>
+
 @endsection
