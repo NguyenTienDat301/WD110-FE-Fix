@@ -17,9 +17,7 @@
         </div>
     @endif
 
-    <h1 class="text-center mt-5">Danh sách phiếu giảm giá</h1>
 
-    <a class="btn btn-outline-success mb-3 mt-3" href="{{ route('vouchers.create') }}">Thêm mới voucher</a>
 
     <form method="GET" action="{{ route('vouchers.index') }}" id="filterForm" class="mb-3 p-3">
         <div class="row">
@@ -61,6 +59,36 @@
         </div>
     </form>
 
+        <div class="content-header">
+            <div class="container-fluid">
+                <h1 class="m-0 text-center">Danh sách phiếu giảm giá</h1>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="card card-outline card-success">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <a class="btn btn-success" href="{{ route('vouchers.create') }}">
+                        <i class="fas fa-plus"></i> Thêm mới voucher
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="{{ route('vouchers.index') }}" id="filterForm" class="mb-3">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <select name="status" id="status" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                                    <option value="" class="text-dark">Tất cả trạng thái</option>
+                                    <option value="1" class="text-dark" {{ request('status') == '1' ? 'selected' : '' }}>Đang hoạt động</option>
+                                    <option value="0" class="text-dark" {{ request('status') == '0' ? 'selected' : '' }}>Không hoạt động</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select name="expiry_status" id="expiry_status" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                                    <option value="" class="text-dark">Tất cả thời hạn</option>
+                                    <option value="valid" class="text-dark" {{ request('expiry_status') == 'valid' ? 'selected' : '' }}>Còn hạn</option>
+                                    <option value="expired" class="text-dark" {{ request('expiry_status') == 'expired' ? 'selected' : '' }}>Đã hết hạn</option>
+                                </select>
+                            </div>
     <div class="table-responsive">
         <table class="table table-bordered table-hover">
             <thead>

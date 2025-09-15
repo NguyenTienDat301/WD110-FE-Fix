@@ -13,6 +13,7 @@ class Ship_address extends Model
         'ship_address',
         'phone_number',
         'recipient_name',
+        'sender_name', // Thông tin người gửi
         'is_default',
     ];
 

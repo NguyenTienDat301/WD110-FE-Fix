@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Events\OrderStatusUpdated;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -60,12 +61,12 @@ class UserOrderController extends Controller
             // Retrieve the order
             $order = Order::where('id', $orderId)
                 ->where('user_id', Auth::id())
-                ->whereIn('status', [0, 1]) // Allow canceling when pending or processed
+                ->where('status', 0) // Chỉ cho phép hủy khi ở trạng thái "Chờ xử lý"
                 ->first();
 
 
             if (!$order) {
-                return response()->json(['message' => 'Đơn hàng không tồn tại '], 404);
+                return back()->with('error', 'Đơn hàng không tồn tại hoặc không thể hủy.');
             }
 
             // Retrieve the cancellation reason and add custom message if provided
@@ -83,14 +84,17 @@ class UserOrderController extends Controller
 
             // Retrieve each order detail and adjust product quantities
             foreach ($order->orderDetails as $orderDetail) {
-                $product = Product::find($orderDetail->product_id);
+                // Restore quantity for the specific product variant
+                $variant = ProductVariant::where('product_id', $orderDetail->product_id)
+                    ->where('color_id', $orderDetail->color_id)
+                    ->where('size_id', $orderDetail->size_id)
+                    ->first();
 
-                if ($product) {
-                    // Increase the product's quantity and decrease the sold quantity
-                    $product->quantity += $orderDetail->quantity;
-                    $product->sell_quantity -= $orderDetail->quantity;
-                    $product->save();
+                if ($variant) {
+                    $variant->quantity += $orderDetail->quantity;
+                    $variant->save();
                 }
+
             }
 
             // Update order status to indicate it was canceled (set status to 4)

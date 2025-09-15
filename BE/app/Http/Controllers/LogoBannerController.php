@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\LogoBanner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+
 class LogoBannerController extends Controller
 {
     public function index()
@@ -17,6 +18,7 @@ class LogoBannerController extends Controller
     {
         return view('logo_banners.create');
     }
+
     public function store(Request $request)
     {
         // Kiểm tra xem trong bảng LogoBanner đã có đủ 3 bản ghi chưa
@@ -26,12 +28,26 @@ class LogoBannerController extends Controller
         }
 
         // Validate dữ liệu từ request
-        $data = $request->validate([
-            'type' => 'required',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string|max:8192',
-            'image' => 'required|image',
-        ]);
+        $data = $request->validate(
+            [
+                'type' => 'required',
+                'title' => 'required|string|max:255',
+                'description' => 'nullable|string|max:8192',
+                'image' => 'required|image',
+            ],
+            [
+                'required' => ':attribute không được để trống.',
+                'string' => ':attribute phải là một chuỗi ký tự.',
+                'max' => ':attribute không được vượt quá :max ký tự.',
+                'image' => ':attribute phải là một tệp ảnh.',
+            ],
+            [
+                'type' => 'Loại',
+                'title' => 'Tiêu đề',
+                'description' => 'Mô tả',
+                'image' => 'Hình ảnh',
+            ]
+        );
 
         // Nếu có file hình ảnh, lưu vào storage
         if ($request->hasFile('image')) {
@@ -43,7 +59,9 @@ class LogoBannerController extends Controller
 
         return redirect()->route('logo_banners.index')->with('success', 'Thao tác thành công ');
     }
-public function edit($id)
+
+
+    public function edit($id)
     {
         $logoBanner = LogoBanner::findOrFail($id);
         return view('logo_banners.edit', compact('logoBanner'));
@@ -53,13 +71,29 @@ public function edit($id)
     {
         try {
             // Kiểm tra dữ liệu gửi lên
-            $data = $request->validate([
-                'type' => 'required',
-                'title' => 'required|string|max:255',
-                'description' => 'nullable|string|max:8192',
-                'image' => 'nullable|image', // Không bắt buộc phải có hình ảnh
-                'is_active' => 'required|boolean', // Đảm bảo is_active được gửi đúng
-            ]);
+            $data = $request->validate(
+                [
+                    'type' => 'required',
+                    'title' => 'required|string|max:255',
+                    'description' => 'nullable|string|max:8192',
+                    'image' => 'nullable|image', // Không bắt buộc phải có hình ảnh
+                    'is_active' => 'required|boolean', // Đảm bảo is_active được gửi đúng
+                ],
+                [
+                    'required' => ':attribute không được để trống.',
+                    'string' => ':attribute phải là một chuỗi ký tự.',
+                    'max' => ':attribute không được vượt quá :max ký tự.',
+                    'image' => ':attribute phải là một tệp ảnh.',
+                    'boolean' => ':attribute phải là true hoặc false.',
+                ],
+                [
+                    'type' => 'Loại',
+                    'title' => 'Tiêu đề',
+                    'description' => 'Mô tả',
+                    'image' => 'Hình ảnh',
+                    'is_active' => 'Trạng thái',
+                ]
+            );
 
             $logoBanner = LogoBanner::findOrFail($id);
 
@@ -81,6 +115,24 @@ public function edit($id)
         } catch (\Exception $e) {
             // Nếu có lỗi, trả về thông báo lỗi
             return back()->with('error', 'Có lỗi xảy ra khi cập nhật: ');
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $logoBanner = LogoBanner::findOrFail($id);
+
+            // Xóa hình ảnh khỏi storage nếu có
+            if ($logoBanner->image) {
+                Storage::delete('public/' . $logoBanner->image);
+            }
+
+            $logoBanner->delete();
+
+            return redirect()->route('logo_banners.index')->with('success', 'Xóa logo/banner thành công!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Có lỗi xảy ra khi xóa: ' . $e->getMessage());
         }
     }
 }

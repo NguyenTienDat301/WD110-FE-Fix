@@ -17,19 +17,23 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::with('user', 'shipAddress', 'orderDetails');
 
-        if ($request->has('status') && $request->input('status') !== '') {
-            // Lọc theo trạng thái nếu có giá trị trong input
-            $status = $request->input('status');
-            if ($status !== '') {
-                $query->where('status', $status);
-            }
+        $query = Order::with(['user', 'shipAddress', 'orderDetails', 'payment']);
+
+
+        // Lọc theo trạng thái đơn hàng
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
         }
 
-        // Lấy danh sách đơn hàng (nếu không có trạng thái, sẽ lấy tất cả)
-        $orders = $query->latest()
-            ->paginate(5);
+        // Lọc theo mã đơn hàng
+        if ($request->filled('keyword')) {
+            $keyword = $request->input('keyword');
+            $query->where('id', 'like', "%$keyword%") ;
+        }
+
+        // Lấy danh sách đơn hàng
+        $orders = $query->latest()->paginate(5);
 
         if ($request->has('order_id') && $request->has('status')) {
             $orderId = $request->input('order_id');
@@ -44,7 +48,7 @@ class OrderController extends Controller
                 $allowedTransitions = [
                     0 => [1, 4], // Chờ xử lý -> Đã xử lý hoặc Hủy
                     1 => [2, 4], // Đã xử lý -> Đang vận chuyển hoặc Hủy
-                    2 => [3, 4], // Đang vận chuyển -> Giao hàng thành công hoặc Hủy
+                    2 => [3],    // Đang vận chuyển -> Giao hàng thành công
                     3 => [5],    // Giao hàng thành công -> Đã trả lại
                     4 => [],     // Đã hủy -> Không thể chuyển sang trạng thái khác
                     5 => []      // Đã trả lại -> Không thể chuyển sang trạng thái khác
@@ -60,11 +64,11 @@ class OrderController extends Controller
                         4 => 'Đã hủy',
                         5 => 'Đã trả lại'
                     ];
-                    
+
                     $currentStatusName = $statusNames[$oldStatus] ?? 'Không xác định';
                     $newStatusName = $statusNames[$newStatus] ?? 'Không xác định';
-                    
-                    return redirect()->back()->with('error', 
+
+                    return redirect()->back()->with('error',
                         "Không thể chuyển từ trạng thái '{$currentStatusName}' sang '{$newStatusName}'. " .
                         "Chỉ có thể cập nhật từng bước một theo quy trình: Chờ xử lý → Đã xử lý → Đang vận chuyển → Giao hàng thành công"
                     );
@@ -130,7 +134,7 @@ class OrderController extends Controller
         $allowedTransitions = [
             0 => [1, 4], // Chờ xử lý -> Đã xử lý hoặc Hủy
             1 => [2, 4], // Đã xử lý -> Đang vận chuyển hoặc Hủy
-            2 => [3, 4], // Đang vận chuyển -> Giao hàng thành công hoặc Hủy
+            2 => [3],    // Đang vận chuyển -> Giao hàng thành công
             3 => [5],    // Giao hàng thành công -> Đã trả lại
             4 => [],     // Đã hủy -> Không thể chuyển
             5 => []      // Đã trả lại -> Không thể chuyển

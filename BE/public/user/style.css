@@ -1,0 +1,129 @@
+/* Sidebar animation */
+.sidebar {
+    animation: sidebar-slide-in 0.7s cubic-bezier(0.77,0,0.175,1);
+}
+@keyframes sidebar-slide-in {
+    from { transform: translateX(-40px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+.sidebar-link {
+    transition: background 0.3s, color 0.3s, box-shadow 0.3s, transform 0.2s;
+}
+.sidebar-link:hover {
+    transform: translateX(6px) scale(1.04);
+    box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
+}
+.btn, .btn-logout {
+    transition: background 0.25s, color 0.25s, box-shadow 0.25s, transform 0.18s;
+}
+.btn:active, .btn-logout:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.card {
+    animation: card-fade-in 0.6s cubic-bezier(0.77,0,0.175,1);
+}
+@keyframes card-fade-in {
+    from { transform: translateY(24px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+.modal.fade .modal-dialog {
+    transition: transform 0.35s cubic-bezier(0.77,0,0.175,1), opacity 0.35s;
+    transform: translateY(24px);
+    opacity: 0;
+}
+.modal.fade.show .modal-dialog {
+    transform: translateY(0);
+    opacity: 1;
+}
+/* Đảm bảo rằng ảnh và văn bản trong profile không tạo khoảng trống */
+.nav-profile-text {
+    display: flex;
+    align-items: center; /* Căn giữa các phần tử */
+    margin-bottom: 10px; /* Giảm khoảng cách giữa phần profile và menu */
+}
+
+/* Giảm padding cho phần tử img và các phần tử liên quan */
+.img-profile {
+    width: 50px;
+    height: 50px;
+    object-fit: cover; /* Đảm bảo ảnh không bị méo */
+    margin-right: 10px; /* Khoảng cách giữa ảnh và văn bản */
+}
+
+.login-status {
+    margin-left: 5px; /* Khoảng cách giữa dấu trạng thái và văn bản */
+}
+
+/* Đảm bảo menu bên dưới không bị khoảng cách lớn */
+.menu-container {
+    width: 250px;
+    background-color: #f0f0f0;
+    border-right: 1px solid #ddd;
+    padding-top: 10px; /* Giảm padding trên */
+    padding-bottom: 10px; /* Giảm padding dưới */
+}
+
+.menu {
+    margin-top: 0;
+    padding: 0;
+}
+
+.dropdown {
+    margin-bottom: 10px; /* Tạo khoảng cách đều giữa các menu */
+}
+
+/* Điều chỉnh button trong dropdown */
+.dropdown-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-content {
+    margin-left: 10px; /* Căn đều các item trong dropdown */
+}
+
+/* Điều chỉnh khoảng cách chung */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+}
+
+.content-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+    flex-grow: 1;
+    margin-left: 10px; /* Giảm khoảng cách giữa menu và content */
+}
+
+/* General hover effect for buttons */
+.menu a:hover,
+.dropdown-btn:hover {
+    background-color: #e0e0e0;
+    transition: background-color 0.3s ease;
+}
+
+/* Add styles for dropdown items */
+.dropdown-content li a {
+    padding: 8px 15px;
+    display: block;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+}
+
+.dropdown-content li a:hover {
+    background-color: #f0f0f0;
+}
+
+/* Add pointer to indicate clickable items */
+.dropdown-btn {
+    cursor: pointer;
+}
+

@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Size extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'size',
     ];
@@ -16,5 +15,14 @@ class Size extends Model
     public function products()
     {
         return $this->belongsToMany(Product::class);
+    }
+
+    public function cartItems()
+    {
+        return $this->hasMany(CartItem::class);
+    }
+    public function orderDetails()
+    {
+        return $this->hasMany(Order_detail::class);
     }
 }

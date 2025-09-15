@@ -83,18 +83,36 @@ class VoucherController extends Controller
     {
         try {
             // Xác thực các trường dữ liệu
-            $request->validate([
-                'code' => 'required|string|max:10|unique:vouchers',
-                'discount_value' => 'required|numeric',
-                'description' => 'nullable|string',
-                'quantity' => 'required|integer',
-                'used_times' => 'nullable|integer|min:0',
-                'start_day' => 'nullable|date',
-                'end_day' => 'nullable|date',
-                'is_active' => 'required|boolean', // Trường 'is_active' thay vì 'status'
-                'total_min' => 'required|numeric',
-                'total_max' => 'required|numeric'
-            ]);
+            $request->validate(
+                [
+                    'code' => 'required|string|max:10|unique:vouchers',
+                    'discount_value' => 'required|numeric',
+                    'description' => 'nullable|string',
+                    'quantity' => 'required|integer',
+                    'used_times' => 'nullable|integer|min:0',
+                    'start_day' => 'nullable|date',
+                    'end_day' => 'nullable|date',
+                    'is_active' => 'required|boolean', // Trường 'is_active' thay vì 'status'
+                    'total_min' => 'required|numeric',
+                    'total_max' => 'required|numeric'
+                ],
+                [
+                    'required' => ':attribute không được để trống.',
+                    'unique' => ':attribute đã tồn tại.',
+                    'numeric' => ':attribute phải là một số.',
+                    'integer' => ':attribute phải là số nguyên.',
+                    'date' => ':attribute không phải là ngày hợp lệ.',
+                ],
+                [
+                    'code' => 'Mã voucher',
+                    'discount_value' => 'Giá trị giảm giá',
+                    'quantity' => 'Số lượng',
+                    'start_day' => 'Ngày bắt đầu',
+                    'end_day' => 'Ngày kết thúc',
+                    'total_min' => 'Giá trị đơn hàng tối thiểu',
+                    'total_max' => 'Giá trị đơn hàng tối đa',
+                ]
+            );
 
             // Kiểm tra ngày kết thúc phải lớn hơn ngày bắt đầu
             if ($request->end_day < $request->start_day) {
@@ -163,17 +181,36 @@ class VoucherController extends Controller
         }
 
         // Validate dữ liệu còn lại
-        $request->validate([
-            'code' => 'required|max:10|unique:vouchers,code,' . $id,
-            'discount_value' => 'required|numeric',
-            'description' => 'nullable|string',
-            'quantity' => 'required|integer',
-            'start_day' => 'nullable|date',
-            'end_day' => 'nullable|date|after_or_equal:start_day',
-            'is_active' => 'required|boolean',
-            'total_min' => 'required|numeric',
-            'total_max' => 'required|numeric'
-        ]);
+        $request->validate(
+            [
+                'code' => 'required|max:10|unique:vouchers,code,' . $id,
+                'discount_value' => 'required|numeric',
+                'description' => 'nullable|string',
+                'quantity' => 'required|integer',
+                'start_day' => 'nullable|date',
+                'end_day' => 'nullable|date|after_or_equal:start_day',
+                'is_active' => 'required|boolean',
+                'total_min' => 'required|numeric',
+                'total_max' => 'required|numeric'
+            ],
+            [
+                'required' => ':attribute không được để trống.',
+                'unique' => ':attribute đã tồn tại.',
+                'numeric' => ':attribute phải là một số.',
+                'integer' => ':attribute phải là số nguyên.',
+                'date' => ':attribute không phải là ngày hợp lệ.',
+                'after_or_equal' => ':attribute phải là một ngày sau hoặc bằng Ngày bắt đầu.',
+            ],
+            [
+                'code' => 'Mã voucher',
+                'discount_value' => 'Giá trị giảm giá',
+                'quantity' => 'Số lượng',
+                'start_day' => 'Ngày bắt đầu',
+                'end_day' => 'Ngày kết thúc',
+                'total_min' => 'Giá trị đơn hàng tối thiểu',
+                'total_max' => 'Giá trị đơn hàng tối đa',
+            ]
+        );
 
         // Cập nhật voucher
         $voucher = Voucher::findOrFail($id);

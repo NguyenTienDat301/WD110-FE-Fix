@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Throwable;
+
 class ReviewController extends Controller
 {
     public function store(Request $request, $orderId)
@@ -33,6 +34,7 @@ class ReviewController extends Controller
                     return redirect()->back()->withErrors('Bình luận của bạn chứa từ ngữ không hợp lệ. Vui lòng sửa đổi.');
                 }
             }
+
             // Xác nhận đơn hàng tồn tại và hợp lệ
             $order = Order::findOrFail($orderId);
 
@@ -60,6 +62,7 @@ class ReviewController extends Controller
                 'rating' => $request->input('rating'),
                 'comment' => $comment,
             ]);
+
             // Đánh dấu đơn hàng đã được đánh giá
             $order->update(['is_reviewed' => true]);
 

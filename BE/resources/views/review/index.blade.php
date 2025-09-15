@@ -66,7 +66,7 @@
                                 </td>
                                 <td>{{ $review->created_at->format('d/m/Y H:i') }}</td>
                                 <td>
-                                    <form method="POST" action="{{ route('review.update', $review->id) }}">
+                                    <form method="POST" action="{{ route('review.update', $review->id) }}" novalidate>
                                         @csrf
                                         @method('PUT')
                                         

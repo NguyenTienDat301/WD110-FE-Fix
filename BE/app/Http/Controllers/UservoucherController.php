@@ -10,15 +10,37 @@ class UservoucherController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id(); // Lấy ID người dùng đang đăng nhập
+        $search = request('search');
+        $userId = Auth::id();
+        $now = \Carbon\Carbon::now();
 
-        // Lấy danh sách voucher chưa được người dùng sử dụng
-        $vouchers = Voucher::where('is_active', 1)
+        $usableVouchers = Voucher::where('is_active', 1)
+            ->where('start_day', '<=', $now)
+            ->where('end_day', '>=', $now)
+            ->whereRaw('quantity > used_times')
             ->whereDoesntHave('voucherUsages', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
-            })
-            ->paginate(5);
+            });
+        if ($search) {
+            $usableVouchers = $usableVouchers->where('code', 'like', "%$search%");
+        }
+        $usableVouchers = $usableVouchers->paginate(8);
 
-        return view('user.voucher', compact('vouchers'));
+        $unusableVouchers = Voucher::where(function($query) use ($userId, $now) {
+                $query->where('is_active', 0)
+                    ->orWhere('end_day', '<', $now)
+                    ->orWhereRaw('quantity <= used_times')
+                    ->orWhereHas('voucherUsages', function ($q) use ($userId) {
+                        $q->where('user_id', $userId);
+                    });
+            });
+        if ($search) {
+            $unusableVouchers = $unusableVouchers->where('code', 'like', "%$search%");
+        }
+        $unusableVouchers = $unusableVouchers->paginate(8);
+
+        return view('user.voucher', compact('usableVouchers', 'unusableVouchers', 'search'));
     }
-}
+
+
+    }

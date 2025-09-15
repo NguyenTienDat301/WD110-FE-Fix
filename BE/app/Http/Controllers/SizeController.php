@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Size;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
 class SizeController extends Controller
 {
-     public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
         // Lấy tất cả kích thước, kèm theo số lượng sản phẩm sử dụng mỗi kích thước
         $data = Size::latest('id')->paginate(5);
@@ -22,7 +26,8 @@ class SizeController extends Controller
         return view('bienthe.sizes.index', compact('data'));
     }
 
-     /**
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
@@ -36,7 +41,13 @@ class SizeController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'size'      => 'required|max:25',
+            'size'      => 'required|max:25|unique:sizes,size',
+        ], [
+            'size.required' => ':attribute không được để trống.',
+            'size.max' => ':attribute không được vượt quá 25 ký tự.',
+            'size.unique' => ':attribute này đã tồn tại.',
+        ], [
+            'size' => 'Kích cỡ'
         ]);
 
         try {
@@ -50,7 +61,7 @@ class SizeController extends Controller
         }
     }
 
-     /**
+    /**
      * Display the specified resource.
      */
     public function show(Size $size)
@@ -58,7 +69,7 @@ class SizeController extends Controller
         return view('bienthe.sizes.show', compact('size'));
     }
 
-     /**
+    /**
      * Show the form for editing the specified resource.
      */
     public function edit(Size $size)
@@ -66,13 +77,19 @@ class SizeController extends Controller
         return view('bienthe.sizes.edit', compact('size'));
     }
 
-     /**
+    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Size $size)
     {
         $data = $request->validate([
-            'size'      => 'required|max:25',
+            'size'      => 'required|max:25|unique:sizes,size,' . $size->id,
+        ], [
+            'size.required' => ':attribute không được để trống.',
+            'size.max' => ':attribute không được vượt quá 25 ký tự.',
+            'size.unique' => ':attribute này đã tồn tại.',
+        ], [
+            'size' => 'Kích cỡ'
         ]);
 
         try {
@@ -85,7 +102,8 @@ class SizeController extends Controller
         }
     }
 
-     /**
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Size $size)

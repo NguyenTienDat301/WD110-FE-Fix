@@ -55,8 +55,7 @@
                     </td>
                     <td> <span hidden class="badge {{ $banner->is_active ? 'badge-success' : 'badge-danger' }}">
                             {{ $banner->is_active ? 'Active' : 'Inactive' }}
-                        </span></td>
-                    <td>
+                        </span>
                         <a href="{{ route('logo_banners.edit', $banner->id) }}" class="btn btn-warning btn-sm">Cập nhật</a>
                         <form action="{{ route('logo_banners.destroy', $banner->id) }}" method="POST" style="display:inline-block;">
                             @csrf
@@ -64,6 +63,7 @@
                             <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa logo/banner này không?');">Xóa</button>
                         </form>
                     </td>
+
                 </tr>
             @empty
                 <tr>
