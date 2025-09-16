@@ -1,23 +1,17 @@
-import Blog from "../../assets/imgs/page/homepage1/blog1.png";
-import BlogTwo from "../../assets/imgs/page/homepage1/blog2.png";
-import BlogThree from "../../assets/imgs/page/homepage1/blog3.png";
 import Arrow from "../../assets/imgs/template/icons/arrow-hover.svg";
 import ArrowHover from "../../assets/imgs/template/icons/arrow-hover.svg";
-import Ig from "../../assets/imgs/page/homepage1/instagram6.png";
-import IgOne from "../../assets/imgs/page/homepage1/instagram.png";
-import IgThree from "../../assets/imgs/page/homepage1/instagram3.png";
-import IgFour from "../../assets/imgs/page/homepage1/instagram4.png";
-import IgTwo from "../../assets/imgs/page/homepage1/instagram2.png";
-import IgFive from "../../assets/imgs/page/homepage1/instagram5.png";
-import Promotion from "../../assets/imgs/template/promotion.png";
-import PromotionBanner from "../../assets/imgs/template/promotion-banner.png";
+import Ig from "../../assets/imgs/page/homepage1/Ao-bong-da-bayern-munich-san-nha-1.jpg";
+import IgOne from "../../assets/imgs/page/homepage1/Ao-bong-da-real-madrid-san-nha-2425-1.jpg";
+import IgThree from "../../assets/imgs/page/homepage1/htt4714.png";
+import IgFour from "../../assets/imgs/page/homepage1/Ao-doi-tuyen-phap-san-nha-1.jpg";
+import IgTwo from "../../assets/imgs/page/homepage1/photo-2024-06-26-13-22-53-1719385515835.jpg";
+import IgFive from "../../assets/imgs/page/homepage1/photo-2024-06-26-13-22-53-1719385515835.jpg";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { message, Pagination } from "antd";
+import { Pagination } from "antd";
 import type { PaginationProps } from "antd";
 import axios from "axios";
 import "./new.css";
-import api from "../../Axios/Axios";
 const New: React.FC = () => {
   const [blog, setBlog] = useState<any[]>([]);
   const [blog4, setBlog4] = useState<any>();
@@ -25,7 +19,6 @@ const New: React.FC = () => {
   const [current, setCurrent] = useState(1);
 
   const onChange: PaginationProps["onChange"] = (page) => {
-    console.log(page);
     setCurrent(page);
   };
 
@@ -35,24 +28,23 @@ const New: React.FC = () => {
         const { data } = await axios.get(`http://127.0.0.1:8000/api/blog`);
         setBlog(data);
       } catch (error) {
-        console.log(error);
+        console.error("Lỗi khi tải blog:", error);
       }
     };
     const GetQuangCao = async () => {
       try {
         const { data } = await axios.get(
-          `http://127.0.0.1:8000/api/logobanner/${4}`
+          `http://127.0.0.1:8000/api/logobanner/6`
         );
         setBlog4(data);
       } catch (error) {
-        console.log(error);
+        console.error("Lỗi khi tải banner quảng cáo:", error);
       }
     };
     GetLogo();
     GetQuangCao();
   }, []);
 
-  console.log("Blog 4", blog4);
 
   const paginatedBlog = blog.slice(
     (current - 1) * pageSize,
@@ -102,22 +94,22 @@ const New: React.FC = () => {
                                             <p className="font-md neutral-900">Jun</p>
                                         </div>
                                     </div> */}
-                      <a>
+                      <div>
                         <img
                           src={b.image}
                           alt="kidify"
                           style={{ width: "100%", height: "350px" }}
                         />
-                      </a>
+                      </div>
                     </div>
                     <div className="cardInfo">
-                      <a className="cardTitle">
+                      <div className="cardTitle">
                         <h5 className="font-xl-bold">{b.title}</h5>
-                      </a>
+                      </div>
                       <p className="cardDesc font-lg neutral-500">
                         {truncateText(b.description)}
                       </p>
-                      <a className="btn btn-arrow-right">
+                      <div className="btn btn-arrow-right">
                         Xem chi tiết
                         <img src={Arrow} alt="Kidify" />
                         <img
@@ -125,7 +117,7 @@ const New: React.FC = () => {
                           src={ArrowHover}
                           alt="Kidify"
                         />
-                      </a>
+                      </div>
                     </div>
                   </div>
                 </Link>
@@ -176,62 +168,64 @@ const New: React.FC = () => {
       {/* Quảng cáo  */}
       {blog4 && (
         <div>
-          {isOpen && (
-            <div className="box-popup-newsletter">
-              <div className="box-newsletter-overlay" onClick={closeModal} />{" "}
-              {/* Overlay có thể đóng modal */}
-              <div className="box-newsletter-wrapper">
-                <div className="box-newsletter-inner">
-                  <a
-                    className="btn-close-popup btn-close-popup-newsletter"
-                    href="#"
-                    onClick={closeModal}
-                  >
-                    <svg
-                      className="icon-16 d-inline-flex align-items-center justify-content-center"
-                      fill="#111111"
-                      stroke="#111111"
-                      width={24}
-                      height={24}
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
+          {isOpen && blog4 && (
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                background: "rgba(0,0,0,0.3)",
+                zIndex: 9999,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              <div
+                style={{
+                  position: "relative",
+                  background: "#fff",
+                  borderRadius: "12px",
+                  padding: 0,
+                  width: "600px",
+                  maxWidth: "95vw",
+                  boxShadow: "0 2px 16px rgba(0,0,0,0.2)"
+                }}
+              >
+                <button
+                  onClick={closeModal}
+                  style={{
+                    position: "absolute",
+                    top: 10,
+                    right: 10,
+                    background: "#fff",
+                    border: "none",
+                    fontSize: 24,
+                    cursor: "pointer",
+                    zIndex: 2
+                  }}
+                >
+                  ×
+                </button>
+                <img
+                  src={blog4.image}
+                  alt={blog4.title}
+                  style={{
+                    width: "100%",
+                    height: "350px",
+                    objectFit: "cover",
+                    borderRadius: "12px 12px 0 0",
+                    display: "block"
+                  }}
+                />
+                <div style={{ padding: "24px 32px 24px 32px", textAlign: "center" }}>
+                  <h2 style={{ margin: 0, fontSize: 28 }}>{blog4.title}</h2>
+                  <p style={{ margin: "8px 0 16px 0", fontSize: 18 }}>{blog4.description}</p>
+                  <a href="/product" className="btn btn-primary" style={{ background: "#222", color: "#fff", padding: "10px 28px", borderRadius: 6, fontWeight: 600, textDecoration: "none", fontSize: 18 }}>
+                    Mua sắm ngay
                   </a>
-                  <div className="promotion-content">
-                    <div className="block-info-banner">
-                      <p className="font-3xl-bold neutral-900 title-line mb-10 wow animate__animated animate__zoomIn">
-                        Winter
-                      </p>
-                      <h2 className="heading-banner mb-10 wow animate__animated animate__shakeX">
-                        <span className="text-up">{blog4?.title}</span>
-                        <span className="text-under">{blog4?.title}</span>
-                      </h2>
-                      <h4 className="heading-4 title-line-2 mb-30 wow animate__animated animate__zoomIn">
-                        {blog4?.description}
-                      </h4>
-                      <div className="mt-10">
-                        <a
-                          className="btn btn-double-border wow animate__animated animate__zoomIn"
-                          href="/product"
-                        >
-                          <span>Mua sắm ngay</span>
-                        </a>
-                      </div>
-                    </div>
-                    {/* <div className="promotion-label">
-                  <img src={Promotion} alt="Kidify" />
-                </div> */}
-                    <div className="promotion-banner">
-                      <img src={blog4?.image} alt="Kidify" />
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

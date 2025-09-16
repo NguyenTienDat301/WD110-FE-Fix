@@ -32,6 +32,7 @@ const ProductDetailComponent: React.FC = () => {
   const [isLogin, setIsLogin] = useState<boolean>(false);
   const [checkAdmin, setCheckAdmin] = useState<boolean>(false);
   const navigate = useNavigate();
+  const [selectedVariant, setSelectedVariant] = useState<any>(null);
 
   const convertToVND = (usdPrice: number) => {
     return usdPrice.toLocaleString("vi-VN");
@@ -108,6 +109,28 @@ const ProductDetailComponent: React.FC = () => {
     GetProductsById();
   }, [product]);
 
+  // Khi chọn size hoặc màu, tìm variant phù hợp
+  useEffect(() => {
+    if (product && selectedSize && selectedColor) {
+      const variant = product.variants?.find(
+        (v: any) =>
+          v.size_id === selectedSize && v.color_id === selectedColor
+      );
+      setSelectedVariant(variant || null);
+    } else {
+      setSelectedVariant(null);
+    }
+  }, [product, selectedSize, selectedColor]);
+
+  // Hàm kiểm tra xem một biến thể có còn hàng không
+  const isVariantAvailable = (colorId: string, sizeId: string) => {
+    if (!product) return false;
+    const variant = product.variants?.find(
+      (v: any) => v.color_id === colorId && v.size_id === sizeId
+    );
+    return variant && variant.quantity > 0;
+  };
+
   console.log("chi tiết sản phẩm", productById);
 
   const handleAddToCart = async () => {
@@ -126,45 +149,32 @@ const ProductDetailComponent: React.FC = () => {
         placement: "bottomRight",
       });
       return;
-    } else {
-      if (!selectedSize || !selectedColor) {
-        notification.warning({
-          message:
-            "Vui lòng chọn kích thước và màu sắc trước khi thêm vào giỏ hàng!",
-        });
-      }
-      const sizeId = product.sizes.find(
-        (size: any) => size.size === selectedSize
-      )?.id;
-      const colorId = product.colors.find(
-        (color: any) => color.name_color === selectedColor
-      )?.id;
-      try {
-        const cartData = {
-          productId: product.id,
-          quantity,
-          sizeId,
-          colorId,
-        };
-        if (quantity > product.quantity && quantity > 1) {
-          message.error(`Số lượng sản phẩm này chỉ còn ${product.quantity} trong kho !`);
-          return;
-        }
-        if (product.quantity > 0) {
-          await dispatch(addToCart(cartData));
-          notification.success({
-            message: "Thêm vào giỏ hàng thành công !",
-            placement: "bottomRight",
-          });
-        } else {
-          message.error("Sản phẩm này hiện không còn hàng !");
-        }
-      } catch (error) {
-        console.error("Lỗi khi thêm sản phẩm vào giỏ hàng:", error);
-        notification.error({
-          message: "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại!",
-        });
-      }
+    }
+    if (!selectedVariant) {
+      notification.warning({
+        message: "Vui lòng chọn đúng kích thước và màu sắc có hàng!",
+      });
+      return;
+    }
+    if (quantity > selectedVariant.quantity) {
+      message.error(`Số lượng sản phẩm này chỉ còn ${selectedVariant.quantity} trong kho !`);
+      return;
+    }
+    try {
+      const cartData = {
+        product_variant_id: selectedVariant.id,
+        quantity,
+      };
+      await dispatch(addToCart(cartData));
+      notification.success({
+        message: "Thêm vào giỏ hàng thành công !",
+        placement: "bottomRight",
+      });
+    } catch (error) {
+      console.error("Lỗi khi thêm sản phẩm vào giỏ hàng:", error);
+      notification.error({
+        message: "Không thể thêm sản phẩm vào giỏ hàng. Vui lòng thử lại!",
+      });
     }
   };
 
@@ -238,7 +248,7 @@ const ProductDetailComponent: React.FC = () => {
                     <div className="product-image-slider">
                       <figure className="border-radius-10">
                         <a className="glightbox">
-                          <img width={"100%"} src={`${product.avatar}`} />
+                          <img width={"100%"} src={product.avatar_url} />
                         </a>
                       </figure>
                     </div>
@@ -265,103 +275,115 @@ const ProductDetailComponent: React.FC = () => {
                     </div>
                   )}
                   {/* end */}
-                  <span
+                  {/* <span
                     style={{ fontFamily: "Raleway" }}
                     className="font-md neutral-500"
                   >
                     ({product.reviews.length} Reviews - {product.sell_quantity}{" "}
                     Orders)
-                  </span>
+                  </span> */}
                   <div className="block-price" style={{ marginTop: "20px" }}>
-                    <span
-                      style={{ fontFamily: "Raleway", fontSize: "25px" }}
-                      className="price-main"
-                    >
-                      {Math.round(product.price).toLocaleString("vi", {
-                        style: "currency",
-                        currency: "VND",
-                      })}
+                    <span style={{ fontFamily: "Raleway", fontSize: "25px" }} className="price-main">
+                      {selectedVariant
+                        ? `${convertToVND(selectedVariant.price_sale || selectedVariant.price)}đ`
+                        : "Chọn biến thể để xem giá"}
                     </span>
                   </div>
-                  <div className="block-view">
-                    <p
-                      style={{ fontFamily: "Raleway" }}
-                      className="font-md neutral-900"
-                    >
-                      {product.description}
-                    </p>
-                  </div>
+                  
 
                   <div className="block-color">
                     <span style={{ fontFamily: "Raleway" }}>Color:</span>
                     <label style={{ fontFamily: "Raleway", marginLeft:'5px' }}>
-                      {selectedColor || "Chọn Màu"}
+                      {product.colors.find((c: any) => c.id === selectedColor)?.name_color || "Chọn Màu"}
                     </label>
                     <ul className="list-color-detail">
-                      {product.colors.map((color: any) => (
-                        <button
-                          className="button-color"
-                          key={color.id}
-                          style={{
-                            fontFamily: "Raleway",
-                            padding: "10px 15px",
-                            border:
-                              selectedColor === color.name_color
-                                ? "1px solid rgb(159,137,219)"
-                                : "1px solid gray",
-                            borderRadius: "8px",
-                            backgroundColor: "white",
-                            // background: selectedColor === color.name_color ? 'rgb(159,137,219)' : 'none',
-                            margin: "0 5px 0 0",
-                            color:
-                              selectedColor === color.name_color
-                                ? "rgb(159,137,219)"
-                                : "black",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => setSelectedColor(color.name_color)}
-                        >
-                          {color.name_color}
-                        </button>
-                      ))}
+                      {product.colors.map((color: any) => {
+                        const isAvailable = product.sizes.some((size: any) => isVariantAvailable(color.id, size.id));
+                        return (
+                          <button
+                            className={`button-color ${
+                              !isAvailable ? "disabled" : ""
+                            }`}
+                            key={color.id}
+                            style={{
+                              fontFamily: "Raleway",
+                              padding: "10px 15px",
+                              border:
+                                selectedColor === color.id
+                                  ? "1px solid rgb(159,137,219)"
+                                  : "1px solid gray",
+                              borderRadius: "8px",
+                              backgroundColor: !isAvailable
+                                ? "#f0f0f0"
+                                : "white",
+                              margin: "0 5px 0 0",
+                              color:
+                                selectedColor === color.id
+                                  ? "rgb(159,137,219)"
+                                  : !isAvailable
+                                  ? "#ccc"
+                                  : "black",
+                              cursor: !isAvailable ? "not-allowed" : "pointer",
+                            }}
+                            onClick={() => isAvailable && setSelectedColor(color.id)}
+                            disabled={!isAvailable}
+                          >
+                            {color.name_color}
+                          </button>
+                        );
+                      })}
                     </ul>
                   </div>
                   <div className="block-size">
                     <span style={{ fontFamily: "Raleway" }}>Size:</span>
                     <label style={{ fontFamily: "Raleway", marginLeft:'5px' }}>
-                      {selectedSize || "Chọn Size"}
+                      {product.sizes.find((s: any) => s.id === selectedSize)?.size || "Chọn Size"}
                     </label>
                     <div className="list-sizes-detail">
-                      {product.sizes.map((size: any) => (
-                        <button
-                          className="button-size"
-                          key={size.id}
-                          style={{
-                            padding: "10px 15px",
-                            border:
-                              selectedSize === size.size
-                                ? "1px solid rgb(159,137,219)"
-                                : "1px solid gray",
-                            borderRadius: "8px",
-                            backgroundColor: "white",
-                            color:
-                              selectedSize === size.size
-                                ? "rgb(159,137,219)"
-                                : "black",
-                            margin: "0 5px 0 0",
-                            cursor: "pointer",
-                          }}
-                          onClick={() => setSelectedSize(size.size)}
-                        >
-                          {size.size}
-                        </button>
-                      ))}
+                      {product.sizes.map((size: any) => {
+                        const isAvailable = selectedColor
+                          ? isVariantAvailable(selectedColor, size.id)
+                          : product.colors.some((color: any) =>
+                              isVariantAvailable(color.id, size.id)
+                            );
+                        return (
+                          <button
+                            className={`button-size ${
+                              !isAvailable ? "disabled" : ""
+                            }`}
+                            key={size.id}
+                            style={{
+                              padding: "10px 15px",
+                              border:
+                                selectedSize === size.id
+                                  ? "1px solid rgb(159,137,219)"
+                                  : "1px solid gray",
+                              borderRadius: "8px",
+                              backgroundColor: !isAvailable
+                                ? "#f0f0f0"
+                                : "white",
+                              color:
+                                selectedSize === size.id
+                                  ? "rgb(159,137,219)"
+                                  : !isAvailable
+                                  ? "#ccc"
+                                  : "black",
+                              margin: "0 5px 0 0",
+                              cursor: !isAvailable ? "not-allowed" : "pointer",
+                            }}
+                            onClick={() => isAvailable && setSelectedSize(size.id)}
+                            disabled={!isAvailable}
+                          >
+                            {size.size}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
-                  {/* Tình trạng */}
+                  {/* Số lượng tồn kho */}
                   <div className="block-size">
-                    <span style={{ fontFamily: "Raleway" }}>Tình trạng:</span>
-                    {product.quantity > 0 ? (
+                    <span style={{ fontFamily: "Raleway" }}>Số lượng tồn kho:</span>
+                    {selectedVariant ? (
                       <span
                         style={{
                           fontFamily: "Raleway",
@@ -371,7 +393,7 @@ const ProductDetailComponent: React.FC = () => {
                           marginLeft:'5px'
                         }}
                       >
-                        Còn hàng
+                        {selectedVariant.quantity}
                       </span>
                     ) : (
                       <span
@@ -382,7 +404,7 @@ const ProductDetailComponent: React.FC = () => {
                           fontStyle: "italic",
                         }}
                       >
-                        Hết hàng
+                        Vui lòng chọn biến thể
                       </span>
                     )}
                   </div>

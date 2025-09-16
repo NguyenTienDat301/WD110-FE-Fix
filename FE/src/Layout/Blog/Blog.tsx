@@ -1,11 +1,11 @@
-import BlogComponent from "../../Component/BlogComponent/BlogComponent";
+import BlogComponent from "../../Component/BlogComponent/BlogComponent"
 
-const Blog: React.FC = () => {
-  return (
-    <>
-      <BlogComponent />
-    </>
-  );
-};
+const Blog:React.FC = () => {
+    return (
+        <>
+        <BlogComponent />
+        </>
+    )
+}
 
-export default Blog;
+export default Blog

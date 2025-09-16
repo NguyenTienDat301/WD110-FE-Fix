@@ -1,15 +1,5 @@
-import Sale from "../../assets/imgs/page/homepage1/upto60.png";
-import Banner from "../../assets/imgs/page/homepage1/bg-section2.png";
-import ProductDetail from "../../assets/imgs/page/product/img.png";
-import ProductDetailTwo from "../../assets/imgs/page/product/img-2.png";
-import ProductDetailThree from "../../assets/imgs/page/product/img-3.png";
-import ProductDetailFour from "../../assets/imgs/page/product/img-4.png";
-import ProductDetailFive from "../../assets/imgs/page/product/img-5.png";
-import ProductDetailSix from "../../assets/imgs/page/product/img-6.png";
-import { Swiper, SwiperSlide } from "swiper/react";
-import Star from "../../assets/imgs/template/icons/star.svg";
 import api from "../../Axios/Axios";
-import { message, Pagination } from "antd";
+import { Pagination } from "antd";
 import { useState, useEffect } from "react";
 import { IProduct } from "../../types/cart";
 import type { PaginationProps } from "antd";
@@ -150,43 +140,37 @@ const ProductWithCategories: React.FC = () => {
               <div className="row">
                 {paginatedProducts.map((product) => (
                   <div
+                    key={product.id}
                     className="col-xl-3 col-lg-4 col-md-6 col-sm-6 wow animate__animated animate__fadeIn"
                     data-wow-delay=".5s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
-                      <div className="cardProduct wow fadeInUp">
-                        <div className="cardImage">
+                      <div className="cardProduct wow fadeInUp" style={{ height: '100%' }}>
+                        <div className="cardImage" style={{ height: '270px', overflow: 'hidden' }}>
                           {/* <label className="lbl-hot">hot</label> */}
-                          <a>
+                          <div style={{ height: '100%' }}>
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
-                          </a>
+                          </div>
                           <div className="button-select">
-                            <a>Add to Cart</a>
+                            <a href="#">Add to Cart</a>
                           </div>
                         </div>
                         <div className="cardInfo">
-                          <h6
-                            className="font-md-bold cardTitle"
-                            style={{
-                              fontFamily: "Raleway",
-                              fontWeight: "normal",
-                            }}
-                          >
+                          <h6 className="font-md-bold cardTitle">
                             {product.name}
                           </h6>
-                          <p
-                            className="font-lg cardDesc"
-                            style={{ fontFamily: "Raleway" }}
-                          >
+                          <p className="font-lg cardDesc">
                             {" "}
                             {Math.round(product.price ?? 0).toLocaleString(
                               "vi-VN",
@@ -209,48 +193,44 @@ const ProductWithCategories: React.FC = () => {
               <div className="row">
                 {paginatedTopProducts.map((product) => (
                   <div
+                    key={product.id}
                     className="col-xl-3 col-lg-4 col-md-6 col-sm-6 wow animate__animated animate__fadeIn"
                     data-wow-delay=".1s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
-                      <div className="cardProduct wow fadeInUp">
-                        <div className="cardImage">
+                      <div className="cardProduct wow fadeInUp" style={{ height: '100%' }}>
+                        <div className="cardImage" style={{ height: '270px', overflow: 'hidden' }}>
                           <label className="lbl-hot">hot</label>
-                          <a href="product-single.html">
+                          <div style={{ height: '100%' }}>
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
-                          </a>
+                          </div>
                           <div className="button-select">
-                            <a>Add to Cart</a>
+                            <a href="#">Add to Cart</a>
                           </div>
                         </div>
                         <div className="cardInfo">
-                          <h6
-                            className="font-md-bold cardTitle"
-                            style={{
-                              fontFamily: "Raleway",
-                              fontWeight: "normal",
-                            }}
-                          >
+                          <h6 className="font-md-bold cardTitle">
                             {product.name}
                           </h6>
-                          <p
-                            className="font-lg cardDesc"
-                            style={{ fontFamily: "Raleway" }}
-                          >
-                            {" "}
+                          <p className="font-lg cardDesc">
                             {Math.round(product.price ?? 0).toLocaleString(
                               "vi-VN",
                               { style: "currency", currency: "VND" }
                             )}
+                          </p>
+                          <p className="font-sm text-success mb-0">
+                            Đã bán: <b>{product.total_sold}</b>
                           </p>
                         </div>
                       </div>
@@ -269,43 +249,37 @@ const ProductWithCategories: React.FC = () => {
               <div className="row">
                 {paginatedNewProducts.map((product) => (
                   <div
+                    key={product.id}
                     className="col-xl-3 col-lg-4 col-md-6 col-sm-6 wow animate__animated animate__fadeIn"
                     data-wow-delay=".1s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
-                      <div className="cardProduct wow fadeInUp">
-                        <div className="cardImage">
+                      <div className="cardProduct wow fadeInUp" style={{ height: '100%' }}>
+                        <div className="cardImage" style={{ height: '270px', overflow: 'hidden' }}>
                           <label className="lbl-hot">new</label>
-                          <a href="product-single.html">
+                          <div style={{ height: '100%' }}>
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             />
-                          </a>
+                          </div>
                           <div className="button-select">
-                            <a>Add to Cart</a>
+                            <a href="#">Add to Cart</a>
                           </div>
                         </div>
                         <div className="cardInfo">
-                          <h6
-                            className="font-md-bold cardTitle"
-                            style={{
-                              fontFamily: "Raleway",
-                              fontWeight: "normal",
-                            }}
-                          >
+                          <h6 className="font-md-bold cardTitle">
                             {product.name}
                           </h6>
-                          <p
-                            className="font-lg cardDesc"
-                            style={{ fontFamily: "Raleway" }}
-                          >
+                          <p className="font-lg cardDesc">
                             {" "}
                             {Math.round(product.price ?? 0).toLocaleString(
                               "vi-VN",

@@ -1,9 +1,5 @@
-import MasterCart from "../../assets/imgs/template/icons/mastercard.svg";
-import GooglePay from "../../assets/imgs/template/icons/googlepay.svg";
-import Payoneer from "../../assets/imgs/template/icons/payoneer.svg";
-import Logo from "../../assets/imgs/template/logo.svg";
+import Logo from "../../assets/imgs/template/110.jpg";
 import { useEffect, useState } from "react";
-import api from "../../Axios/Axios";
 import axios from "axios";
 const Footer: React.FC = () => {
 
@@ -13,11 +9,22 @@ const Footer: React.FC = () => {
   useEffect(()=>{
     const GetLogo = async () => {
       try {
-        const { data } = await  axios.get(`http://127.0.0.1:8000/api/logobanner/${1}`);
-         setLogo(data.image)
+        const { data } = await axios.get(`http://127.0.0.1:8000/api/logobanner`);
+        const logos = data['2']; // Lấy danh sách logo từ key '2'
+        if (logos && Array.isArray(logos) && logos.length > 0) {
+          const latestLogo = [...logos].sort((a, b) => b.id - a.id)[0];
+          if (latestLogo && latestLogo.image) {
+            setLogo(latestLogo.image);
+          } else {
+            setLogo(Logo);
+          }
+        } else {
+          setLogo(Logo);
+        }
       } catch (error) {
-         console.log(error);
-         
+         console.error("Lỗi khi tải logo footer:", error);
+         // Sử dụng logo mặc định nếu API fail
+         setLogo(Logo);
       }
     };
     GetLogo()
@@ -40,10 +47,10 @@ const Footer: React.FC = () => {
                   Số 22, ngõ 20/4 phố Nghĩa Đô, Cầu Giấy, Hà Nội
                 </p>
                 <p className="neutral-900 font-lg phone-footer">
-                  +84 (0)986936908
+                  +84 (0)0976462724
                 </p>
                 <p className="neutral-900 font-lg email-footer">
-                  lienhe@LyxFury.vn
+                  110Store@gmail.com
                 </p>
               </div>
               {/* <div className="col-lg-9 mb-30">
@@ -101,16 +108,16 @@ const Footer: React.FC = () => {
                   className="col-lg-3 col-md-12 text-center text-lg-start mb-20 wow animate__animated animate__fadeIn"
                   data-wow-delay=".0s"
                 >
-                  <a href="index.html">
+                  <div>
                     <img src={isLogo} alt="" width={'100px'} />
-                  </a>
+                  </div>
                 </div>
                 <div
                   className="col-lg-6 col-md-12 text-center mb-20 wow animate__animated animate__fadeIn"
                   data-wow-delay=".0s"
                 >
-                  <span className="body-p1 neutral-900 mr-5">©2024</span>
-                  <a href="#">Lyx Fury</a>
+                  <span className="body-p1 neutral-900 mr-5">©2025</span>
+                  <a href="#">110Store</a>
                 </div>
                 <div
                   className="col-lg-3 col-md-12 text-center text-lg-end mb-20 wow animate__animated animate__fadeIn"

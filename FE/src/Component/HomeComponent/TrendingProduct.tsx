@@ -46,7 +46,7 @@ const TrendingProduct: React.FC = () => {
               slidesPerView={3}
               spaceBetween={30}
             >
-              {trendingProducts.map((product) => (
+              {/* {trendingProducts.map((product) => (
                 <SwiperSlide>
                   <div className="cardProduct wow fadeInUp">
                     <div className="cardImage">
@@ -82,7 +82,7 @@ const TrendingProduct: React.FC = () => {
                     </div>
                   </div>
                 </SwiperSlide>
-              ))}
+              ))} */}
             </Swiper>
           </div>
         </div>

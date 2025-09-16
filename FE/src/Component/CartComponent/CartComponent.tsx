@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { RootState, useAppDispatch } from "../../Redux/store";
 import { useEffect, useState } from "react";
 import { fetchCart } from "../../Redux/Reducer/CartReducer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { fetchVouchers } from "../../Redux/Reducer/VoucherReducer";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import api from "../../Axios/Axios";
@@ -16,6 +16,7 @@ interface CartProps {
 }
 
 const CartComponent: React.FC<CartProps> = ({ userId }) => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const cart = useSelector((state: RootState) => state.cart.items);
   const vouchers = useSelector((state: RootState) => state.voucherReducer);
@@ -31,6 +32,8 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
   const [selectedColor, setSelectedColor] = useState<any>(null);
   const [selectedSize, setSelectedSize] = useState<any>(null);
   const [isIdQuantity, setIdQuantity] = useState<any>();
+  const [selectedVariantId, setSelectedVariantId] = useState<any>(null);
+  const [selectedItems, setSelectedItems] = useState<number[]>([]);
 
   useEffect(() => {
     dispatch(fetchCart(userId));
@@ -39,6 +42,19 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
   useEffect(() => {
     dispatch(fetchVouchers());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (productid && selectedSize && selectedColor) {
+      const variant = productid.variants?.find(
+        (v: any) =>
+          v.size_id === selectedSize &&
+          v.color_id === selectedColor
+      );
+      setSelectedVariantId(variant ? variant.id : null);
+    } else {
+      setSelectedVariantId(null);
+    }
+  }, [productid, selectedSize, selectedColor]);
 
   const handleVoucherInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setVoucherCode(e.target.value);
@@ -60,19 +76,20 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
     });
   };
 
-  const showModal = (id: any, idcart: any) => {
+  const showModal = (productId: any, cartItemId: any) => {
     setIsModalOpen(true);
-    setIdQuantity(idcart);
-    getVariant(id);
+    setIdQuantity(cartItemId);
+    getVariant(productId);
   };
 
   console.log("Biến thể", productid);
 
   const handleOk = () => {
     setIsModalOpen(false);
-    if (selectedColor && selectedSize) {
-      updateVariant(isIdQuantity, selectedColor, selectedSize);
+    if (selectedVariantId) {
+      updateVariant(isIdQuantity, selectedVariantId);
     } else {
+      message.error("Vui lòng chọn đúng biến thể!");
     }
   };
 
@@ -109,13 +126,13 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
       await api.put(`/carts/${id}`, { quantity });
       getAllCart();
     } catch (error) {
-      message.error("Vượt quá số lượng có trong kho !");
+      message.error('Vượt quá số lượng có trong kho !')
     }
   };
 
-  const updateVariant = async (id: any, color_id: any, size_id: any) => {
+  const updateVariant = async (cartItemId: any, product_variant_id: any) => {
     try {
-      await api.put(`/carts/${id}`, { color_id, size_id });
+      await api.put(`/carts/${cartItemId}`, { product_variant_id });
       getAllCart();
       message.success("Cập nhật giỏ hàng thành công !");
     } catch (error) {
@@ -131,13 +148,40 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
     setSelectedSize(sizeId);
   };
 
+  const handleItemSelection = (itemId: number) => {
+    setSelectedItems((prevSelectedItems) => {
+      if (prevSelectedItems.includes(itemId)) {
+        return prevSelectedItems.filter((id) => id !== itemId);
+      } else {
+        return [...prevSelectedItems, itemId];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedItems.length === isCart.length) {
+      setSelectedItems([]);
+    } else {
+      setSelectedItems(isCart.map((item) => item.id));
+    }
+  };
+
+  const handleCheckout = () => {
+    if (selectedItems.length > 0) {
+      localStorage.setItem("selectedCartItems", JSON.stringify(selectedItems));
+      navigate(`/checkout/${userId}`);
+    } else {
+      message.warning("Vui lòng chọn sản phẩm để thanh toán.");
+    }
+  };
+
   const handleColorIdcart = (idCartss: any) => {
     setIdQuantity(idCartss);
   };
 
-  const handleDelete = async (productId: number) => {
+  const handleDelete = async (cartItemId: number) => {
     try {
-      await api.delete(`/carts/${productId}`);
+      await api.delete(`/carts/${cartItemId}`);
       window.location.reload();
     } catch (error) {
       console.log(error);
@@ -176,6 +220,10 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
       </div>
     );
 
+  const selectedCartItems = isCart.filter((item) =>
+    selectedItems.includes(item.id)
+  );
+
   return (
     <main className="main">
       <section className="section block-blog-single block-cart">
@@ -203,6 +251,16 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
               <table className="table table-striped table-cart">
                 <thead>
                   <tr>
+                    <th>
+                      <input
+                        type="checkbox"
+                        onChange={handleSelectAll}
+                        checked={
+                          isCart.length > 0 &&
+                          selectedItems.length === isCart.length
+                        }
+                      />
+                    </th>
                     <th>Tên sản phẩm</th>
                     <th>Ảnh</th>
                     <th>Giá</th>
@@ -228,6 +286,13 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
                   isCart.map((item, index) => (
                     <tbody key={index}>
                       <tr>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedItems.includes(item.id)}
+                            onChange={() => handleItemSelection(item.id)}
+                          />
+                        </td>
                         <td>
                           <p>{item.product_name}</p>
                           <div
@@ -427,97 +492,87 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
               </main>
             </Modal>
 
-            <div
-              className="row"
-              style={{ display: "flex", justifyContent: "end" }}
-            >
-              {/* Phần tính tổng tiền giỏ hàng */}
-              {isCart.length > 0 && (
-                <div className="col-lg-4 mb-30">
-                  <div className="box-cart-total">
-                    {/* Hiển thị subtotal (tổng tiền giỏ hàng trước khi áp dụng voucher) */}
-                    <div className="item-total">
-                      <span className="font-sm">Tạm tính</span>
-                      <span className="font-md-bold">
-                        <span>
-                          {isCart
-                            .reduce(
-                              (acc, item) =>
-                                acc +
-                                Number(item.price) * Number(item.quantity),
-                              0
-                            )
-                            .toLocaleString("vi", {
-                              style: "currency",
-                              currency: "VND",
-                            })}
-                        </span>
-                      </span>
-                    </div>
-
-                    {/* Hiển thị phí vận chuyển */}
-                    <div className="item-total">
-                      <span className="font-sm">Phí ship</span>
-                      <span className="font-md-bold">Free</span>
-                    </div>
-                    {/* <div className="item-total">
-                    <span className="font-sm">Estimate for</span>
-                    <span className="font-md-bold">United Kingdom</span>
-                  </div> */}
-
-                    <div className="item-total border-0">
-                      <span className="font-sm">Tổng tiền</span>
-                      <span className="font-xl-bold">
-                        <span>
-                          {(
-                            isCart.reduce(
-                              (acc, item) =>
-                                acc +
-                                Number(item.price) * Number(item.quantity),
-                              0
-                            ) *
-                            (1 - discountValue / 100)
-                          ).toLocaleString("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          })}
-                        </span>
-                      </span>
-                    </div>
-                    <Link to={`/checkout/${userId}`}>
-                      <button className="btn btn-brand-1-xl-bold w-100 font-sm-bold">
-                        Tiến hành thanh toán
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              )}
-              <div className="col-lg-3 mb-30">
-                <div className="box-button-checkout">
-                  <Link
-                    to="/product"
-                    className="btn btn-brand-1-border-2 mr-10"
+            {isCart.length > 0 && (
+              <div
+                className="row"
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  background: "#fff",
+                  padding: "15px",
+                  borderTop: "1px solid #eee",
+                  marginTop: "30px",
+                }}
+              >
+                <div style={{ flex: "0 0 auto" }}>
+                  <label
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "10px",
+                      cursor: "pointer",
+                    }}
                   >
-                    Tiếp tục mua sắm
-                    <svg
-                      className="icon-16 ml-5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
+                    <input
+                      type="checkbox"
+                      onChange={handleSelectAll}
+                      checked={
+                        isCart.length > 0 &&
+                        selectedItems.length === isCart.length
+                      }
+                    />
+                    <span>Tất cả ({isCart.length} sản phẩm)</span>
+                  </label>
+                </div>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                    gap: "20px",
+                  }}
+                >
+                  <span>
+                    Tổng thanh toán ({selectedItems.length} sản phẩm):
+                    <span
+                      style={{
+                        color: "#B61C1C",
+                        fontWeight: "bold",
+                        marginLeft: "5px",
+                        fontSize: "1.2rem",
+                      }}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M4.5 12h15m0 0l-6.75-6.75M19.5 12l-6.75 6.75"
-                      />
-                    </svg>
-                  </Link>
+                      {(
+                        selectedCartItems.reduce(
+                          (acc, item) =>
+                            acc +
+                            Number(item.price) * Number(item.quantity),
+                          0
+                        ) *
+                        (1 - discountValue / 100)
+                      ).toLocaleString("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      })}
+                    </span>
+                  </span>
+                  <button
+                    className="btn btn-brand-1-xl-bold font-sm-bold"
+                    onClick={handleCheckout}
+                    disabled={selectedItems.length === 0}
+                    style={{
+                      minWidth: "150px",
+                      backgroundColor:
+                        selectedItems.length > 0 ? "#B61C1C" : "#ccc",
+                      border: "none",
+                    }}
+                  >
+                    Mua hàng ({selectedItems.length})
+                  </button>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
