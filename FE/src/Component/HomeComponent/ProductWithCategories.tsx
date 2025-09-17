@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { IProduct } from "../../types/cart";
 import type { PaginationProps } from "antd";
 import { Link } from "react-router-dom";
+
 const ProductWithCategories: React.FC = () => {
   const [products, setProducts] = useState<IProduct[]>([]);
   const [Newproducts, setNewProducts] = useState<IProduct[]>([]);
@@ -79,14 +80,19 @@ const ProductWithCategories: React.FC = () => {
       <section className="section block-section-1">
         <div className="container">
           <div className="text-center">
-            <p className="font-xl brand-2 wow animate__animated animate__fadeIn">
-              <span className="rounded-text">NEW IN STORE</span>
+            <p className="font-xl brand-2 wow animate__animated animate__fadeIn ">
+              <span
+                className="rounded-text "
+                style={{ backgroundColor: "#5090f1ff" }}
+              >
+                NEW IN STORE
+              </span>
             </p>
             <div className="box-tabs wow animate__animated animate__fadeIn">
-              <ul className="nav nav-tabs" role="tablist">
+              <ul className="nav nav-tabs" role="tablist" style={{}}>
                 <li className="nav-item" role="presentation">
                   <button
-                    className="nav-link active"
+                    className="nav-link active "
                     id="girls-tab"
                     data-bs-toggle="tab"
                     data-bs-target="#girls"
@@ -145,21 +151,41 @@ const ProductWithCategories: React.FC = () => {
                     data-wow-delay=".5s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
-                      <div className="cardProduct wow fadeInUp" style={{ height: '100%' }}>
-                        <div className="cardImage" style={{ height: '270px', overflow: 'hidden' }}>
+
+                      <div
+                        className="cardProduct wow fadeInUp"
+                        style={{ height: "100%" }}
+                      >
+                        <div
+                          className="cardImage"
+                          style={{ height: "270px", overflow: "hidden" }}
+                        >
                           {/* <label className="lbl-hot">hot</label> */}
-                          <div style={{ height: '100%' }}>
+                          <div style={{ height: "100%" }}>
+
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+
                             />
                           </div>
                           <div className="button-select">
@@ -198,21 +224,41 @@ const ProductWithCategories: React.FC = () => {
                     data-wow-delay=".1s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
-                      <div className="cardProduct wow fadeInUp" style={{ height: '100%' }}>
-                        <div className="cardImage" style={{ height: '270px', overflow: 'hidden' }}>
+
+                      <div
+                        className="cardProduct wow fadeInUp"
+                        style={{ height: "100%" }}
+                      >
+                        <div
+                          className="cardImage"
+                          style={{ height: "270px", overflow: "hidden" }}
+                        >
                           <label className="lbl-hot">hot</label>
-                          <div style={{ height: '100%' }}>
+                          <div style={{ height: "100%" }}>
+
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+
                             />
                           </div>
                           <div className="button-select">
@@ -223,15 +269,28 @@ const ProductWithCategories: React.FC = () => {
                           <h6 className="font-md-bold cardTitle">
                             {product.name}
                           </h6>
-                          <p className="font-lg cardDesc">
-                            {Math.round(product.price ?? 0).toLocaleString(
-                              "vi-VN",
-                              { style: "currency", currency: "VND" }
-                            )}
-                          </p>
-                          <p className="font-sm text-success mb-0">
-                            Đã bán: <b>{product.total_sold}</b>
-                          </p>
+
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <p className="font-lg cardDesc">
+                              {Math.round(product.price ?? 0).toLocaleString(
+                                "vi-VN",
+                                { style: "currency", currency: "VND" }
+                              )}
+                            </p>
+                            <p
+                              className="font-sm text-success mb-0"
+                              style={{ marginLeft: "12px" }}
+                            >
+                              Đã bán: <b>{product.total_sold}</b>
+                            </p>
+                          </div>
+
                         </div>
                       </div>
                     </Link>
@@ -254,21 +313,41 @@ const ProductWithCategories: React.FC = () => {
                     data-wow-delay=".1s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
-                      <div className="cardProduct wow fadeInUp" style={{ height: '100%' }}>
-                        <div className="cardImage" style={{ height: '270px', overflow: 'hidden' }}>
+
+                      <div
+                        className="cardProduct wow fadeInUp"
+                        style={{ height: "100%" }}
+                      >
+                        <div
+                          className="cardImage"
+                          style={{ height: "270px", overflow: "hidden" }}
+                        >
                           <label className="lbl-hot">new</label>
-                          <div style={{ height: '100%' }}>
+                          <div style={{ height: "100%" }}>
+
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+
+                              style={{
+                                width: "100%",
+                                height: "100%",
+                                objectFit: "cover",
+                              }}
+
                             />
                           </div>
                           <div className="button-select">

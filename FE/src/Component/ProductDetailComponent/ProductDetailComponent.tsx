@@ -76,11 +76,11 @@ const ProductDetailComponent: React.FC = () => {
       try {
         const checkadmin = JSON.parse(userz);
         console.log(checkadmin, "alllll");
-        setIsLogin(true); 
+        setIsLogin(true);
         if (checkadmin?.user?.role === 2) {
-          setCheckAdmin(true); 
+          setCheckAdmin(true);
         } else {
-          setCheckAdmin(false); 
+          setCheckAdmin(false);
         }
       } catch (error) {
         console.error("Dữ liệu trong localStorage không hợp lệ", error);
@@ -113,8 +113,9 @@ const ProductDetailComponent: React.FC = () => {
   useEffect(() => {
     if (product && selectedSize && selectedColor) {
       const variant = product.variants?.find(
-        (v: any) =>
-          v.size_id === selectedSize && v.color_id === selectedColor
+
+        (v: any) => v.size_id === selectedSize && v.color_id === selectedColor
+
       );
       setSelectedVariant(variant || null);
     } else {
@@ -157,7 +158,11 @@ const ProductDetailComponent: React.FC = () => {
       return;
     }
     if (quantity > selectedVariant.quantity) {
-      message.error(`Số lượng sản phẩm này chỉ còn ${selectedVariant.quantity} trong kho !`);
+
+      message.error(
+        `Số lượng sản phẩm này chỉ còn ${selectedVariant.quantity} trong kho !`
+      );
+
       return;
     }
     try {
@@ -283,22 +288,35 @@ const ProductDetailComponent: React.FC = () => {
                     Orders)
                   </span> */}
                   <div className="block-price" style={{ marginTop: "20px" }}>
-                    <span style={{ fontFamily: "Raleway", fontSize: "25px" }} className="price-main">
+
+                    <span
+                      style={{
+                        fontFamily: "Raleway",
+                        fontSize: "25px",
+                        color: !selectedVariant ? "#4da6ff" : "black",
+                      }}
+                      className="price-main"
+                    >
                       {selectedVariant
-                        ? `${convertToVND(selectedVariant.price_sale || selectedVariant.price)}đ`
+                        ? `${convertToVND(
+                            selectedVariant.price_sale || selectedVariant.price
+                          )}đ`
                         : "Chọn biến thể để xem giá"}
                     </span>
                   </div>
-                  
 
                   <div className="block-color">
                     <span style={{ fontFamily: "Raleway" }}>Color:</span>
-                    <label style={{ fontFamily: "Raleway", marginLeft:'5px' }}>
-                      {product.colors.find((c: any) => c.id === selectedColor)?.name_color || "Chọn Màu"}
+                    <label style={{ fontFamily: "Raleway", marginLeft: "5px" }}>
+                      {product.colors.find((c: any) => c.id === selectedColor)
+                        ?.name_color || "Chọn Màu"}
                     </label>
                     <ul className="list-color-detail">
                       {product.colors.map((color: any) => {
-                        const isAvailable = product.sizes.some((size: any) => isVariantAvailable(color.id, size.id));
+                        const isAvailable = product.sizes.some((size: any) =>
+                          isVariantAvailable(color.id, size.id)
+                        );
+
                         return (
                           <button
                             className={`button-color ${
@@ -310,7 +328,9 @@ const ProductDetailComponent: React.FC = () => {
                               padding: "10px 15px",
                               border:
                                 selectedColor === color.id
-                                  ? "1px solid rgb(159,137,219)"
+
+                                  ? "1px solid rgba(137, 179, 219, 1)"
+
                                   : "1px solid gray",
                               borderRadius: "8px",
                               backgroundColor: !isAvailable
@@ -319,13 +339,19 @@ const ProductDetailComponent: React.FC = () => {
                               margin: "0 5px 0 0",
                               color:
                                 selectedColor === color.id
-                                  ? "rgb(159,137,219)"
+
+                                  ? "rgba(137, 178, 219, 1)"
+
                                   : !isAvailable
                                   ? "#ccc"
                                   : "black",
                               cursor: !isAvailable ? "not-allowed" : "pointer",
                             }}
-                            onClick={() => isAvailable && setSelectedColor(color.id)}
+
+                            onClick={() =>
+                              isAvailable && setSelectedColor(color.id)
+                            }
+
                             disabled={!isAvailable}
                           >
                             {color.name_color}
@@ -336,8 +362,11 @@ const ProductDetailComponent: React.FC = () => {
                   </div>
                   <div className="block-size">
                     <span style={{ fontFamily: "Raleway" }}>Size:</span>
-                    <label style={{ fontFamily: "Raleway", marginLeft:'5px' }}>
-                      {product.sizes.find((s: any) => s.id === selectedSize)?.size || "Chọn Size"}
+
+                    <label style={{ fontFamily: "Raleway", marginLeft: "5px" }}>
+                      {product.sizes.find((s: any) => s.id === selectedSize)
+                        ?.size || "Chọn Size"}
+
                     </label>
                     <div className="list-sizes-detail">
                       {product.sizes.map((size: any) => {
@@ -356,7 +385,9 @@ const ProductDetailComponent: React.FC = () => {
                               padding: "10px 15px",
                               border:
                                 selectedSize === size.id
-                                  ? "1px solid rgb(159,137,219)"
+
+                                  ? "1px solid rgba(137, 170, 219, 1)"
+
                                   : "1px solid gray",
                               borderRadius: "8px",
                               backgroundColor: !isAvailable
@@ -364,15 +395,20 @@ const ProductDetailComponent: React.FC = () => {
                                 : "white",
                               color:
                                 selectedSize === size.id
-                                  ? "rgb(159,137,219)"
+
+                                  ? "rgba(137, 155, 219, 1)"
+
                                   : !isAvailable
                                   ? "#ccc"
                                   : "black",
                               margin: "0 5px 0 0",
                               cursor: !isAvailable ? "not-allowed" : "pointer",
                             }}
-                            onClick={() => isAvailable && setSelectedSize(size.id)}
-                            disabled={!isAvailable}
+
+                            onClick={() =>
+                              isAvailable && setSelectedSize(size.id)
+                            }
+               disabled={!isAvailable}
                           >
                             {size.size}
                           </button>
@@ -382,15 +418,18 @@ const ProductDetailComponent: React.FC = () => {
                   </div>
                   {/* Số lượng tồn kho */}
                   <div className="block-size">
-                    <span style={{ fontFamily: "Raleway" }}>Số lượng tồn kho:</span>
+     <span style={{ fontFamily: "Raleway" }}>
+                      Số lượng tồn kho:
+                    </span>
+
                     {selectedVariant ? (
                       <span
                         style={{
                           fontFamily: "Raleway",
                           fontSize: "21px",
-                          color: "rgb(159,134,217)",
+                          color: "rgba(134, 160, 217, 1)",
                           fontStyle: "italic",
-                          marginLeft:'5px'
+                          marginLeft: "5px",
                         }}
                       >
                         {selectedVariant.quantity}
@@ -400,7 +439,7 @@ const ProductDetailComponent: React.FC = () => {
                         style={{
                           fontFamily: "Raleway",
                           fontSize: "21px",
-                          color: "rgb(159,134,217)",
+                          color: "rgba(119, 171, 227, 1)",
                           fontStyle: "italic",
                         }}
                       >

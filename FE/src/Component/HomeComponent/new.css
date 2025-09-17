@@ -1,8 +1,111 @@
 .truncate-text {
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Giới hạn số dòng là 3 */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Giới hạn số dòng là 3 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand-1 {
+  color: #2196f3 !important;
+}
+.nav-tabs .nav-link {
+  color: #070707 !important; /* Màu đen mặc định */
+  font-weight: bold;
+  border-bottom: 1px solid transparent !important;
+  background: transparent !important;
+  font-family: "Poppins", "Montserrat", Arial, Helvetica, sans-serif !important;
+  transition: color 0.2s, border-bottom 0.2s;
+}
+
+.nav-tabs .nav-link.active {
+  color: #2196f3 !important; /* Màu xanh khi được chọn */
+  border-bottom: 1px solid #2196f3 !important;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #2196f3 !important; /* Màu xanh khi hover */
+}
+.banner-homepage1,
+.banner-homepage1 * {
+  font-family: "Poppins", "Montserrat", Arial, Helvetica, sans-serif !important;
+}
+.btn-double-border:hover,
+.btn-double-border:focus {
+  color: #2196f3 !important;
+  border-color: #2196f3 !important;
+  background: #fff !important;
+}
+.button-select a,
+.button-select button {
+  color: #070707 !important; /* Mặc định màu đen */
+  border: 1px solid #2196f3;
+  background: #fff;
+  font-weight: 600;
+  padding: 6px 18px;
+  border-radius: 24px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.button-select a:hover,
+.button-select button:hover {
+  background: #2196f3 !important;
+  color: #fff !important;
+}
+.cardDesc {
+  color: #2196f3 !important;
+  font-weight: 600;
+}
+.cardTitle:hover {
+  color: #2196f3 !important;
+  transition: color 0.2s;
+}
+.cardProduct {
+  min-height: 340px;
+  max-height: 370px;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.08);
+  padding: 16px;
+  background: #fff;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.cardTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.menu-category p {
+  color: #070707; /* Màu đen mặc định */
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+.menu-category p:not(:last-child) {
+  border-bottom: 1.5px solid #050505;
+}
+.menu-category p.active {
+  color: #2196f3 !important; /* Màu xanh khi chọn */
+}
+.cardProduct {
+  background: #f5f5f5; /* Màu xám nhạt cho từng sản phẩm */
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.08);
+  padding: 16px;
+  margin-bottom: 24px; /* Tách riêng từng mục */
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.btn-arrow-right:hover {
+  color: #2196f3 !important;
+  transition: color 0.2s;
+}
