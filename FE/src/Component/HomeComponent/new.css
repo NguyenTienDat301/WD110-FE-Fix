@@ -1,8 +1,14 @@
 .truncate-text {
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Giới hạn số dòng là 3 */
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Giới hạn số dòng là 3 */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.brand-1 {
+  color: #2196f3 !important;
+}
+.nav-link:hover,
+.nav-link.active:hover {
+  color: #2196f3 !important;
+}

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { message, Pagination } from "antd";
 import { IProduct, Size, Color } from "../../types/cart";
 import { Link } from "react-router-dom";
-import type { PaginationProps } from 'antd';
+import type { PaginationProps } from "antd";
 import axios from "axios";
 
 interface ProductListProps {
@@ -21,12 +21,11 @@ const ProductList: React.FC<ProductListProps> = ({ filters }) => {
   const [loading, setLoading] = useState(true);
   const pageSize = 6;
 
-  const onChange: PaginationProps['onChange'] = (page) => {
+  const onChange: PaginationProps["onChange"] = (page) => {
     console.log(page);
     window.scrollTo(0, 0);
     setCurrent(page);
   };
-  
 
   const GetAllProducts = async () => {
     try {
@@ -35,8 +34,8 @@ const ProductList: React.FC<ProductListProps> = ({ filters }) => {
       setFilteredProducts(data.products);
     } catch (error) {
       message.error("Lỗi api!");
-    } finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -46,17 +45,31 @@ const ProductList: React.FC<ProductListProps> = ({ filters }) => {
 
   useEffect(() => {
     const filterData = products.filter((product) => {
-      const matchSize = filters.size ? product.sizes.some((size: Size) => size.size === filters.size) : true;
-      const matchColor = filters.color ? product.colors.some((color: Color) => color.name_color === filters.color) : true;
-      const matchCategory = filters.category ? product.categories.name === filters.category : true;
-      const matchPrice = filters.priceRange ? (product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]) : true;
+      const matchSize = filters.size
+        ? product.sizes.some((size: Size) => size.size === filters.size)
+        : true;
+      const matchColor = filters.color
+        ? product.colors.some(
+            (color: Color) => color.name_color === filters.color
+          )
+        : true;
+      const matchCategory = filters.category
+        ? product.categories.name === filters.category
+        : true;
+      const matchPrice = filters.priceRange
+        ? product.price >= filters.priceRange[0] &&
+          product.price <= filters.priceRange[1]
+        : true;
       return matchSize && matchColor && matchCategory && matchPrice;
     });
 
     setFilteredProducts(filterData);
   }, [filters, products]);
 
-  const paginatedProducts = filteredProducts.slice((current - 1) * pageSize, current * pageSize);
+  const paginatedProducts = filteredProducts.slice(
+    (current - 1) * pageSize,
+    current * pageSize
+  );
 
   if (loading)
     return (
@@ -107,14 +120,24 @@ const ProductList: React.FC<ProductListProps> = ({ filters }) => {
                       />
                     </Link>
                     <div className="button-select">
-                      <Link to={`/product-detail/${product.id}`}>Add to Cart</Link>
+                      <Link to={`/product-detail/${product.id}`}>
+                        Add to Cart
+                      </Link>
                     </div>
                   </div>
                   <div className="cardInfo">
                     <Link to={`/product-detail/${product.id}`}>
-                      <h6 style={{fontFamily:'Raleway', fontWeight:'normal'}} className="cardTitle">{product.name}</h6>
+                      <h6
+                        style={{ fontFamily: "Raleway", fontWeight: "normal" }}
+                        className="cardTitle"
+                      >
+                        {product.name}
+                      </h6>
                     </Link>
-                    <p style={{fontFamily:'Raleway'}} className="font-lg cardDesc">
+                    <p
+                      style={{ fontFamily: "Raleway" }}
+                      className="font-lg cardDesc"
+                    >
                       {Math.round(product.price).toLocaleString("vi", {
                         style: "currency",
                         currency: "VND",
@@ -126,8 +149,13 @@ const ProductList: React.FC<ProductListProps> = ({ filters }) => {
             ))}
           </div>
         </div>
-        <nav className="box-pagination" style={{ float: 'right' }}>
-          <Pagination current={current} onChange={onChange} total={filteredProducts.length} pageSize={pageSize} />
+        <nav className="box-pagination" style={{ float: "right" }}>
+          <Pagination
+            current={current}
+            onChange={onChange}
+            total={filteredProducts.length}
+            pageSize={pageSize}
+          />
         </nav>
       </div>
     </>
