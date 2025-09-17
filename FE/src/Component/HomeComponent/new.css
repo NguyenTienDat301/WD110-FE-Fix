@@ -35,3 +35,46 @@
   border-color: #2196f3 !important;
   background: #fff !important;
 }
+.button-select a,
+.button-select button {
+  color: #070707 !important; /* Mặc định màu đen */
+  border: 1px solid #2196f3;
+  background: #fff;
+  font-weight: 600;
+  padding: 6px 18px;
+  border-radius: 24px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.button-select a:hover,
+.button-select button:hover {
+  background: #2196f3 !important;
+  color: #fff !important;
+}
+.cardDesc {
+  color: #2196f3 !important;
+  font-weight: 600;
+}
+.cardTitle:hover {
+  color: #2196f3 !important;
+  transition: color 0.2s;
+}
+.cardProduct {
+  min-height: 340px;
+  max-height: 370px;
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.08);
+  padding: 16px;
+  background: #fff;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.cardTitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}

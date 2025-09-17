@@ -257,15 +257,26 @@ const ProductWithCategories: React.FC = () => {
                           <h6 className="font-md-bold cardTitle">
                             {product.name}
                           </h6>
-                          <p className="font-lg cardDesc">
-                            {Math.round(product.price ?? 0).toLocaleString(
-                              "vi-VN",
-                              { style: "currency", currency: "VND" }
-                            )}
-                          </p>
-                          <p className="font-sm text-success mb-0">
-                            Đã bán: <b>{product.total_sold}</b>
-                          </p>
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                            }}
+                          >
+                            <p className="font-lg cardDesc">
+                              {Math.round(product.price ?? 0).toLocaleString(
+                                "vi-VN",
+                                { style: "currency", currency: "VND" }
+                              )}
+                            </p>
+                            <p
+                              className="font-sm text-success mb-0"
+                              style={{ marginLeft: "12px" }}
+                            >
+                              Đã bán: <b>{product.total_sold}</b>
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </Link>
