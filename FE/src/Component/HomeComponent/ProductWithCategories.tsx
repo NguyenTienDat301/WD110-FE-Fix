@@ -151,6 +151,7 @@ const ProductWithCategories: React.FC = () => {
                     data-wow-delay=".5s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
+
                       <div
                         className="cardProduct wow fadeInUp"
                         style={{ height: "100%" }}
@@ -161,25 +162,30 @@ const ProductWithCategories: React.FC = () => {
                         >
                           {/* <label className="lbl-hot">hot</label> */}
                           <div style={{ height: "100%" }}>
+
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
+
                               style={{
                                 width: "100%",
                                 height: "100%",
                                 objectFit: "cover",
                               }}
+
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
+
                               style={{
                                 width: "100%",
                                 height: "100%",
                                 objectFit: "cover",
                               }}
+
                             />
                           </div>
                           <div className="button-select">
@@ -218,6 +224,7 @@ const ProductWithCategories: React.FC = () => {
                     data-wow-delay=".1s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
+
                       <div
                         className="cardProduct wow fadeInUp"
                         style={{ height: "100%" }}
@@ -228,25 +235,30 @@ const ProductWithCategories: React.FC = () => {
                         >
                           <label className="lbl-hot">hot</label>
                           <div style={{ height: "100%" }}>
+
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
+
                               style={{
                                 width: "100%",
                                 height: "100%",
                                 objectFit: "cover",
                               }}
+
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
+
                               style={{
                                 width: "100%",
                                 height: "100%",
                                 objectFit: "cover",
                               }}
+
                             />
                           </div>
                           <div className="button-select">
@@ -257,6 +269,7 @@ const ProductWithCategories: React.FC = () => {
                           <h6 className="font-md-bold cardTitle">
                             {product.name}
                           </h6>
+
                           <div
                             style={{
                               display: "flex",
@@ -277,6 +290,7 @@ const ProductWithCategories: React.FC = () => {
                               Đã bán: <b>{product.total_sold}</b>
                             </p>
                           </div>
+
                         </div>
                       </div>
                     </Link>
@@ -299,6 +313,7 @@ const ProductWithCategories: React.FC = () => {
                     data-wow-delay=".1s"
                   >
                     <Link to={`/product-detail/${product.id}`}>
+
                       <div
                         className="cardProduct wow fadeInUp"
                         style={{ height: "100%" }}
@@ -309,25 +324,30 @@ const ProductWithCategories: React.FC = () => {
                         >
                           <label className="lbl-hot">new</label>
                           <div style={{ height: "100%" }}>
+
                             <img
                               className="imageMain"
                               src={product.avatar_url}
                               alt="kidify"
+
                               style={{
                                 width: "100%",
                                 height: "100%",
                                 objectFit: "cover",
                               }}
+
                             />
                             <img
                               className="imageHover"
                               src={product.avatar_url}
                               alt="kidify"
+
                               style={{
                                 width: "100%",
                                 height: "100%",
                                 objectFit: "cover",
                               }}
+
                             />
                           </div>
                           <div className="button-select">

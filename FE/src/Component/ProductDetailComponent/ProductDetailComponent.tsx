@@ -113,7 +113,9 @@ const ProductDetailComponent: React.FC = () => {
   useEffect(() => {
     if (product && selectedSize && selectedColor) {
       const variant = product.variants?.find(
+
         (v: any) => v.size_id === selectedSize && v.color_id === selectedColor
+
       );
       setSelectedVariant(variant || null);
     } else {
@@ -156,9 +158,11 @@ const ProductDetailComponent: React.FC = () => {
       return;
     }
     if (quantity > selectedVariant.quantity) {
+
       message.error(
         `Số lượng sản phẩm này chỉ còn ${selectedVariant.quantity} trong kho !`
       );
+
       return;
     }
     try {
@@ -284,6 +288,7 @@ const ProductDetailComponent: React.FC = () => {
                     Orders)
                   </span> */}
                   <div className="block-price" style={{ marginTop: "20px" }}>
+
                     <span
                       style={{
                         fontFamily: "Raleway",
@@ -311,6 +316,7 @@ const ProductDetailComponent: React.FC = () => {
                         const isAvailable = product.sizes.some((size: any) =>
                           isVariantAvailable(color.id, size.id)
                         );
+
                         return (
                           <button
                             className={`button-color ${
@@ -322,7 +328,9 @@ const ProductDetailComponent: React.FC = () => {
                               padding: "10px 15px",
                               border:
                                 selectedColor === color.id
+
                                   ? "1px solid rgba(137, 179, 219, 1)"
+
                                   : "1px solid gray",
                               borderRadius: "8px",
                               backgroundColor: !isAvailable
@@ -331,15 +339,19 @@ const ProductDetailComponent: React.FC = () => {
                               margin: "0 5px 0 0",
                               color:
                                 selectedColor === color.id
+
                                   ? "rgba(137, 178, 219, 1)"
+
                                   : !isAvailable
                                   ? "#ccc"
                                   : "black",
                               cursor: !isAvailable ? "not-allowed" : "pointer",
                             }}
+
                             onClick={() =>
                               isAvailable && setSelectedColor(color.id)
                             }
+
                             disabled={!isAvailable}
                           >
                             {color.name_color}
@@ -350,9 +362,11 @@ const ProductDetailComponent: React.FC = () => {
                   </div>
                   <div className="block-size">
                     <span style={{ fontFamily: "Raleway" }}>Size:</span>
+
                     <label style={{ fontFamily: "Raleway", marginLeft: "5px" }}>
                       {product.sizes.find((s: any) => s.id === selectedSize)
                         ?.size || "Chọn Size"}
+
                     </label>
                     <div className="list-sizes-detail">
                       {product.sizes.map((size: any) => {
@@ -371,7 +385,9 @@ const ProductDetailComponent: React.FC = () => {
                               padding: "10px 15px",
                               border:
                                 selectedSize === size.id
+
                                   ? "1px solid rgba(137, 170, 219, 1)"
+
                                   : "1px solid gray",
                               borderRadius: "8px",
                               backgroundColor: !isAvailable
@@ -379,17 +395,20 @@ const ProductDetailComponent: React.FC = () => {
                                 : "white",
                               color:
                                 selectedSize === size.id
+
                                   ? "rgba(137, 155, 219, 1)"
+
                                   : !isAvailable
                                   ? "#ccc"
                                   : "black",
                               margin: "0 5px 0 0",
                               cursor: !isAvailable ? "not-allowed" : "pointer",
                             }}
+
                             onClick={() =>
                               isAvailable && setSelectedSize(size.id)
                             }
-                            disabled={!isAvailable}
+               disabled={!isAvailable}
                           >
                             {size.size}
                           </button>
@@ -399,9 +418,10 @@ const ProductDetailComponent: React.FC = () => {
                   </div>
                   {/* Số lượng tồn kho */}
                   <div className="block-size">
-                    <span style={{ fontFamily: "Raleway" }}>
+     <span style={{ fontFamily: "Raleway" }}>
                       Số lượng tồn kho:
                     </span>
+
                     {selectedVariant ? (
                       <span
                         style={{
