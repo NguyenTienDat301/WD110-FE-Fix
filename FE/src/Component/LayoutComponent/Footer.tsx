@@ -60,17 +60,6 @@ function Footer() {
             <p>Bạn có câu hỏi nào cho cửa hàng không?</p>
             <p>Nếu cần sự trợ giúp vui lòng liên hệ</p>
             <p>📞 0123456789</p>
-            <div>
-              <a href="#" className="text-dark me-3 fs-5">
-                📘
-              </a>
-              <a href="#" className="text-dark me-3 fs-5">
-                📸
-              </a>
-              <a href="#" className="text-dark fs-5">
-                📌
-              </a>
-            </div>
           </div>
 
           {/* Bản tin */}
@@ -93,13 +82,6 @@ function Footer() {
               </button>
             </form>
           </div>
-        </div>
-
-        {/* Thẻ thanh toán */}
-        <div className="text-center mt-4">
-          <span className="me-2 fs-4">💳</span>
-          <span className="me-2 fs-4">💰</span>
-          <span className="fs-4">🏦</span>
         </div>
       </div>
     </footer>

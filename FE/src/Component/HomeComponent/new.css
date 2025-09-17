@@ -78,3 +78,34 @@
   text-overflow: ellipsis;
   display: block;
 }
+.menu-category p {
+  color: #070707; /* Màu đen mặc định */
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s;
+  position: relative;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+}
+.menu-category p:not(:last-child) {
+  border-bottom: 1.5px solid #050505;
+}
+.menu-category p.active {
+  color: #2196f3 !important; /* Màu xanh khi chọn */
+}
+.cardProduct {
+  background: #f5f5f5; /* Màu xám nhạt cho từng sản phẩm */
+  border: 2px solid #e0e0e0;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(33, 150, 243, 0.08);
+  padding: 16px;
+  margin-bottom: 24px; /* Tách riêng từng mục */
+  transition: box-shadow 0.2s, border-color 0.2s, background 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.btn-arrow-right:hover {
+  color: #2196f3 !important;
+  transition: color 0.2s;
+}
