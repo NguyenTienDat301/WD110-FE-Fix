@@ -83,18 +83,14 @@ const ProductWithCategories: React.FC = () => {
             <p className="font-xl brand-2 wow animate__animated animate__fadeIn ">
               <span
                 className="rounded-text "
-                style={{ backgroundColor: "#82aff4ff" }}
+                style={{ backgroundColor: "#5090f1ff" }}
               >
                 NEW IN STORE
               </span>
             </p>
             <div className="box-tabs wow animate__animated animate__fadeIn">
               <ul className="nav nav-tabs" role="tablist" style={{}}>
-                <li
-                  className="nav-item"
-                  role="presentation"
-
-                >
+                <li className="nav-item" role="presentation">
                   <button
                     className="nav-link active "
                     id="girls-tab"
