@@ -132,11 +132,11 @@ body, .table, .btn, .ant-modal, .ant-modal-title, input, label, span, p {
 }
 /* Ghi đè header bảng giỏ hàng */
 .table-cart thead tr {
-  background-color: #B61C1C !important; /* Đỏ thương hiệu */
+  background-color: #1f1cb6 !important; /* Đỏ thương hiệu */
 }
 
 .table-cart thead th {
-  background-color: #B61C1C !important;
+  background-color: #1f1cb6 !important;
   color: #fff !important;
   border: none !important;
   font-weight: 600;
@@ -144,4 +144,26 @@ body, .table, .btn, .ant-modal, .ant-modal-title, input, label, span, p {
   padding: 14px;
   font-size: 15px;
   letter-spacing: 0.3px;
+}
+/* Size hiển thị như tag */
+.product-size {
+  display: inline-block;
+  background: #f2f2f2;
+  color: #333;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-right: 8px;
+  font-weight: 500;
+  border: 1px solid #ddd;
+}
+
+/* Color hiển thị chấm tròn */
+.product-color {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  vertical-align: middle;
 }
