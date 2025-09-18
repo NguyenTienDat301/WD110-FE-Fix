@@ -1,34 +1,35 @@
 /* :where(.css-dev-only-do-not-override-142vneq).ant-modal-confirm-confirm .ant-modal-confirm-body>.anticon{
     color: rgb(255,79,81);
 } */
-:where(.css-dev-only-do-not-override-142vneq).ant-notification .ant-notification-notice-wrapper .ant-notification-notice {
-    border: 1px solid #52c41a;
-    border-left: 4px solid #52c41a;
+:where(.css-dev-only-do-not-override-142vneq).ant-notification
+  .ant-notification-notice-wrapper
+  .ant-notification-notice {
+  border: 1px solid #52c41a;
+  border-left: 4px solid #52c41a;
 }
 
 .ant-modal-title {
-    font-size: 22px !important;
-    font-family: "Raleway";
-    padding-bottom: 5px;
+  font-size: 22px !important;
+  font-family: "Raleway";
+  padding-bottom: 5px;
 }
 
-.variant-update{
-    display: flex !important;
-    gap: 10px;
-    justify-content: start;
-    align-items: center;
+.variant-update {
+  display: flex !important;
+  gap: 10px;
+  justify-content: start;
+  align-items: center;
 }
 
-.variants-update{
-    height: 40px;
-    width: 55px;
-    text-align: center;
-    background-color: white;
-    font-size: 14px;
-    border-radius: 6px;
-    font-family: "Raleway";
-    border: 1px solid rgb(159,134,217);
-   
+.variants-update {
+  height: 40px;
+  width: 55px;
+  text-align: center;
+  background-color: white;
+  font-size: 14px;
+  border-radius: 6px;
+  font-family: "Raleway";
+  border: 1px solid rgb(31, 86, 225);
 }
 /* :where(.css-dev-only-do-not-override-142vneq).ant-btn-variant-solid {
     background: linear-gradient(
@@ -42,3 +43,8 @@
    background-color: rgb(105, 72, 183) !important;
 }
  */
+.table-cart thead th {
+  background-color: #419bfc !important;
+  color: #fff !important;
+  text-align: center; /* canh giữa chữ nếu muốn */
+}

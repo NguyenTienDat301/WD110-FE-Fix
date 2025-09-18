@@ -46,9 +46,7 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
   useEffect(() => {
     if (productid && selectedSize && selectedColor) {
       const variant = productid.variants?.find(
-        (v: any) =>
-          v.size_id === selectedSize &&
-          v.color_id === selectedColor
+        (v: any) => v.size_id === selectedSize && v.color_id === selectedColor
       );
       setSelectedVariantId(variant ? variant.id : null);
     } else {
@@ -126,7 +124,7 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
       await api.put(`/carts/${id}`, { quantity });
       getAllCart();
     } catch (error) {
-      message.error('Vượt quá số lượng có trong kho !')
+      message.error("Vượt quá số lượng có trong kho !");
     }
   };
 
@@ -546,8 +544,7 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
                       {(
                         selectedCartItems.reduce(
                           (acc, item) =>
-                            acc +
-                            Number(item.price) * Number(item.quantity),
+                            acc + Number(item.price) * Number(item.quantity),
                           0
                         ) *
                         (1 - discountValue / 100)

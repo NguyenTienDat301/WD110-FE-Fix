@@ -1,20 +1,23 @@
 const Banner: React.FC = () => {
-    return (
-        <>
-            <section className="section block-shop-head">
-                <div className="container">
-                    <h1 className="font-4xl-bold neutral-900">Sport For You</h1>
-                    <div className="breadcrumbs">
-                        <ul>
-                            <li><a href="#">Trang chủ</a></li>
-                            <li><a href="#">Cửa hàng</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </section>
+  return (
+    <>
+      <section className="section block-shop-head">
+        <div className="container">
+          <h1 className="font-4xl-bold neutral-900">Sport For You</h1>
+          <div className="breadcrumbs">
+            <ul>
+              <li>
+                <a href="#">Trang chủ</a>
+              </li>
+              <li>
+                <a href="#">Cửa hàng</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+};
 
-        </>
-    )
-}
-
-export default Banner
+export default Banner;

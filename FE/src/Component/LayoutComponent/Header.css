@@ -159,12 +159,22 @@
 .header .account-icon.cart:hover svg path {
   fill: #2196f3 !important;
 }
-.header.sticky-bar {
-  position: fixed;
+/* Giữ header cố định khi scroll */
+.sticky-bar {
+  position: fixed !important;
   top: 0;
   left: 0;
-  right: 0;
-  z-index: 9999; /* để nó nổi trên các phần tử khác */
-  background-color: #fff; /* hoặc màu nền của header */
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* hiệu ứng bóng đổ nhẹ */
+  width: 100%;
+  z-index: 1000; /* đảm bảo nằm trên các phần tử khác */
+  background: #fff !important; /* nền trắng để không bị trong suốt */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* đổ bóng nhẹ */
+  transition: all 0.3s ease-in-out;
+}
+
+/* Để tránh nội dung bị che bởi header */
+body {
+  padding-top: 80px; /* chỉnh bằng đúng chiều cao header */
+}
+main {
+  padding-top: 40px; /* bằng chiều cao header */
 }
