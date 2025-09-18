@@ -46,9 +46,7 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
   useEffect(() => {
     if (productid && selectedSize && selectedColor) {
       const variant = productid.variants?.find(
-        (v: any) =>
-          v.size_id === selectedSize &&
-          v.color_id === selectedColor
+        (v: any) => v.size_id === selectedSize && v.color_id === selectedColor
       );
       setSelectedVariantId(variant ? variant.id : null);
     } else {
@@ -126,7 +124,7 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
       await api.put(`/carts/${id}`, { quantity });
       getAllCart();
     } catch (error) {
-      message.error('Vượt quá số lượng có trong kho !')
+      message.error("Vượt quá số lượng có trong kho !");
     }
   };
 
@@ -393,7 +391,7 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
                         <td>
                           <span
                             className="brand-1"
-                            style={{ fontFamily: "Raleway" }}
+                            style={{ fontFamily: "Raleway"}}
                           >
                             {(
                               Number(item?.price || 0) *
@@ -541,13 +539,13 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
                         fontWeight: "bold",
                         marginLeft: "5px",
                         fontSize: "1.2rem",
+                        fontFamily: "Raleway",
                       }}
                     >
                       {(
                         selectedCartItems.reduce(
                           (acc, item) =>
-                            acc +
-                            Number(item.price) * Number(item.quantity),
+                            acc + Number(item.price) * Number(item.quantity),
                           0
                         ) *
                         (1 - discountValue / 100)
@@ -558,14 +556,17 @@ const CartComponent: React.FC<CartProps> = ({ userId }) => {
                     </span>
                   </span>
                   <button
-                    className="btn btn-brand-1-xl-bold font-sm-bold"
+                    className="btn fw-bold px-4 py-2"
                     onClick={handleCheckout}
                     disabled={selectedItems.length === 0}
                     style={{
                       minWidth: "150px",
                       backgroundColor:
                         selectedItems.length > 0 ? "#B61C1C" : "#ccc",
+                      color: "#fff",
                       border: "none",
+                      fontSize: "1rem",
+                      fontFamily: "Raleway",
                     }}
                   >
                     Mua hàng ({selectedItems.length})
