@@ -91,3 +91,237 @@
   display: flex;
   justify-content: start;
 }
+/* --- Layout chính --- */
+.main {
+  font-family: "Raleway", sans-serif;
+}
+
+/* Breadcrumb */
+.breadcrumbs ul {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+}
+.breadcrumbs a {
+  color: #0d6efd;
+  text-decoration: none;
+}
+.breadcrumbs a:hover {
+  text-decoration: underline;
+}
+
+/* --- Ảnh sản phẩm --- */
+.detail-gallery {
+  display: flex;
+  gap: 20px;
+}
+.slider-nav-thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.slider-nav-thumbnails img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.slider-nav-thumbnails img:hover {
+  border-color: #0d6efd;
+}
+.box-main-gallery img {
+  max-width: 100%;
+  border-radius: 10px;
+}
+
+/* --- Thông tin sản phẩm --- */
+.box-product-info h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #222;
+}
+
+.block-rating {
+  margin-bottom: 10px;
+}
+
+.price-main {
+  font-size: 26px;
+  font-weight: bold;
+  color: #0d6efd;
+}
+.price-main.muted {
+  color: #777;
+  font-style: italic;
+}
+
+/* --- Nút chọn màu / size --- */
+.button-color,
+.button-size {
+  padding: 10px 15px;
+  margin: 5px 8px 0 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.button-color:hover,
+.button-size:hover {
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+.button-color.active,
+.button-size.active {
+  border-color: #0d6efd;
+  background: #f0f8ff;
+  color: #0d6efd;
+  font-weight: 600;
+}
+.button-color.disabled,
+.button-size.disabled {
+  background: #f8f8f8;
+  border: 1px solid #ddd;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* --- Số lượng tồn kho --- */
+.stock-quantity {
+  font-size: 20px;
+  font-style: italic;
+  color: #0d6efd;
+  margin-left: 8px;
+}
+
+/* --- Ô số lượng + giỏ hàng --- */
+.form-cart {
+  display: flex;
+  align-items: center;
+}
+.form-cart button {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  background: #fff;
+  transition: 0.2s;
+}
+.form-cart button:hover {
+  background: #f0f8ff;
+  color: #0d6efd;
+}
+.form-cart input {
+  width: 60px;
+  text-align: center;
+  border: 1px solid #ccc;
+  font-size: 18px;
+}
+
+.css-button-add {
+  margin-left: 15px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  background: #0d6efd;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+.css-button-add:hover {
+  background: #0b5ed7;
+}
+.css-button-add:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* --- Tab mô tả / đánh giá --- */
+.nav-tab-product {
+  margin-top: 30px;
+  border-bottom: 1px solid #ddd;
+}
+.nav-tab-product .nav-link {
+  padding: 10px 20px;
+  font-weight: 500;
+  color: #444;
+  border: none;
+  background: transparent;
+  transition: all 0.2s;
+}
+.nav-tab-product .nav-link.active {
+  color: #0d6efd;
+  border-bottom: 2px solid #0d6efd;
+}
+.nav-tab-product .nav-link:hover {
+  color: #0d6efd;
+}
+
+/* --- Đánh giá --- */
+.layout-rating {
+  display: flex;
+  gap: 12px;
+  margin: 15px 0;
+}
+.img-rating {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.text-rating .name-user {
+  font-weight: 600;
+}
+.text-rating .content-rating {
+  margin-top: 5px;
+}
+
+/* --- Sản phẩm liên quan --- */
+.cardProduct {
+  margin-top: 20px;
+  transition: transform 0.3s ease;
+}
+.cardProduct:hover {
+  transform: translateY(-5px);
+}
+.cardImage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.cardImage img {
+  width: 100%;
+  transition: all 0.3s ease;
+}
+.cardImage:hover .imageHover {
+  opacity: 1;
+}
+.imageHover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+}
+.cardInfo {
+  text-align: center;
+  margin-top: 10px;
+}
+.cardTitle {
+  font-size: 16px;
+  margin: 5px 0;
+  font-weight: 500;
+  color: #222;
+}
+.cardDesc {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0d6efd;
+}
