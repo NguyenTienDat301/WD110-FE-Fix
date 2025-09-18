@@ -1,3 +1,4 @@
+
 import React from "react";
 
 function Footer() {
@@ -25,6 +26,7 @@ function Footer() {
                 </a>
               </li>
             </ul>
+
           </div>
 
           {/* Trợ giúp */}
@@ -54,6 +56,7 @@ function Footer() {
             </ul>
           </div>
 
+
           {/* Liên lạc */}
           <div className="col-md-3 mb-4">
             <h5 className="text-uppercase mb-3 fw-bold">LIÊN LẠC</h5>
@@ -72,6 +75,7 @@ function Footer() {
                   className="form-control"
                   placeholder="110store@gmail.com"
                 />
+
               </div>
               <button
                 type="submit"

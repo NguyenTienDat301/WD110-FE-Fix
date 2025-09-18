@@ -1,3 +1,4 @@
+
 import React from "react";
 import api from "../../Axios/Axios";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -160,6 +161,7 @@ const BannerComponent: React.FC = () => {
       </div>
     </section>
   );
+
 };
 
 export default BannerComponent;
