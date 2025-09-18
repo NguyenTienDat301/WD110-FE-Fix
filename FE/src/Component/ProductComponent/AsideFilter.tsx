@@ -92,7 +92,7 @@ const AsideFilter: React.FC<AsideFilterProps> = ({ setFilters }) => {
 
   return (
     <div className="col-lg-3 order-lg-first">
-      <div className="sidebar-left">
+      <div className="sidebar-left aside-filter">
         <div className="box-filters-sidebar">
           <div className="row">
             <div className="col-lg-12 col-md-6">

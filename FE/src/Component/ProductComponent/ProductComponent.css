@@ -1,25 +1,58 @@
 .filter-color {
-  border: 1px solid rgb(205, 179, 225);
+  border: 1px solid #0d6efd;
   border-radius: 6px;
 }
 .list-sizes span {
-  border: 1px solid rgb(205, 179, 225);
+  border: 1px solid #0d6efd;
   padding: 3px 10px;
   border-radius: 6px;
 }
 .filter-color:hover {
-  box-shadow: 1px 1px rgb(205, 179, 225);
+  box-shadow: 1px 1px #0d6efd;
 }
 .list-sizes span:hover {
-  box-shadow: 1px 1px rgb(205, 179, 225);
+  box-shadow: 1px 1px #0d6efd;
 }
 .list-sizes span.active {
-  background-color: rgb(206, 167, 236);
+  background-color: #0d6efd;
   color: white;
 }
-.list-color span.active{
-  background-color: rgb(206, 167, 236);
+.list-color span.active {
+  background-color: #0d6efd;
   color: white;
   cursor: pointer;
   border-radius: 6px;
+}
+/* Áp dụng riêng cho aside filter */
+.aside-filter {
+  font-family: "Raleway", sans-serif;
+}
+
+/* Chữ mặc định */
+.aside-filter .list-filter-checkbox span.text-small,
+.aside-filter .list-sizes span,
+.aside-filter .list-color span {
+  color: #000; /* chữ đen mặc định */
+}
+
+/* Khi hover thì xanh */
+.aside-filter .list-filter-checkbox span.text-small:hover,
+.aside-filter .list-sizes span:hover,
+.aside-filter .list-color span:hover {
+  color: #0e0eea;
+  cursor: pointer;
+}
+
+/* Khi được chọn (active) thì xanh */
+.aside-filter .list-sizes span.active,
+.aside-filter .list-color span.active,
+.aside-filter input[type="checkbox"]:checked + span.text-small {
+  color: #000000 !important;
+  font-weight: 600;
+}
+
+/* Checkmark xanh thay vì tím */
+.aside-filter .cb-container input:checked ~ .checkmark {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
 }
