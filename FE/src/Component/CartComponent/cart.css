@@ -1,44 +1,147 @@
-/* :where(.css-dev-only-do-not-override-142vneq).ant-modal-confirm-confirm .ant-modal-confirm-body>.anticon{
-    color: rgb(255,79,81);
-} */
-:where(.css-dev-only-do-not-override-142vneq).ant-notification .ant-notification-notice-wrapper .ant-notification-notice {
-    border: 1px solid #52c41a;
-    border-left: 4px solid #52c41a;
+/* Toàn bộ font chữ */
+body, .table, .btn, .ant-modal, .ant-modal-title, input, label, span, p {
+  font-family: "Poppins", "Raleway", sans-serif !important;
+  color: #333; /* màu chữ mặc định chuyên nghiệp */
 }
 
-.ant-modal-title {
-    font-size: 22px !important;
-    font-family: "Raleway";
-    padding-bottom: 5px;
+/* Table style */
+.table-cart {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  background: #fff;
 }
 
-.variant-update{
-    display: flex !important;
-    gap: 10px;
-    justify-content: start;
-    align-items: center;
+/* Header table */
+.table-cart thead tr {
+  background-color: #b61c1c; /* đỏ chủ đạo */
 }
 
-.variants-update{
-    height: 40px;
-    width: 55px;
-    text-align: center;
-    background-color: white;
-    font-size: 14px;
-    border-radius: 6px;
-    font-family: "Raleway";
-    border: 1px solid rgb(159,134,217);
-   
+.table-cart th {
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  padding: 14px;
+  border: none;
+  font-size: 15px;
+  letter-spacing: 0.3px;
 }
-/* :where(.css-dev-only-do-not-override-142vneq).ant-btn-variant-solid {
-    background: linear-gradient(
-    153deg,
-    rgb(105, 72, 183) 0%,
-    rgb(159, 134, 217) 100%
-  );
+
+/* Body table */
+.table-cart td {
+  text-align: center;
+  padding: 16px;
+  vertical-align: middle;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
 }
-.ant-btn-variant-solid:hover{
-   opacity: 0.7 !important;
-   background-color: rgb(105, 72, 183) !important;
+
+/* Hover hàng */
+.table-cart tbody tr:hover td {
+  background-color: #fafafa;
+  transition: 0.2s ease-in-out;
 }
- */
+
+/* Ảnh trong bảng */
+.table-cart img {
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Giá và Tạm tính (chữ đen/xám thay vì đỏ) */
+.table-cart td .brand-1 {
+  color: #222;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* Input số lượng */
+.input-quantity {
+  width: 50px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Nút +/- số lượng */
+.product-quantity .icon {
+  cursor: pointer;
+  font-size: 16px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+  transition: all 0.2s;
+}
+
+.product-quantity .icon:hover {
+  background: #b61c1c;
+  color: #fff;
+}
+
+/* Footer giỏ hàng */
+.cart-footer, .row {
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+}
+
+/* Tổng tiền */
+.cart-footer .total-price, 
+.row span .total-price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #222; /* màu chữ bình thường */
+}
+
+/* Nút Mua hàng */
+.btn-checkout, 
+.btn.fw-bold {
+  min-width: 160px;
+  background: #b61c1c;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 10px 20px;
+  border: none;
+  transition: all 0.3s;
+}
+
+.btn-checkout:hover,
+.btn.fw-bold:hover:not([disabled]) {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+.btn-checkout:disabled,
+.btn.fw-bold:disabled {
+  background: #ddd;
+  cursor: not-allowed;      
+}
+/* Nút Mua hàng khi không có sản phẩm */
+.btn-checkout:disabled,
+.btn.fw-bold:disabled {
+    background: #ddd;
+    cursor: not-allowed;
+    color: #888;
+    border: none;
+}
+/* Ghi đè header bảng giỏ hàng */
+.table-cart thead tr {
+  background-color: #B61C1C !important; /* Đỏ thương hiệu */
+}
+
+.table-cart thead th {
+  background-color: #B61C1C !important;
+  color: #fff !important;
+  border: none !important;
+  font-weight: 600;
+  text-align: center;
+  padding: 14px;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+}
