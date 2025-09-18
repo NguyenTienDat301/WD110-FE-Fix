@@ -152,7 +152,7 @@
 .price-main {
   font-size: 26px;
   font-weight: bold;
-  color: #0d6efd;
+  color: #ff4d4d !important;
 }
 .price-main.muted {
   color: #777;
@@ -324,4 +324,8 @@
   font-size: 15px;
   font-weight: 600;
   color: #0d6efd;
+}
+.main,
+.main * {
+  font-family: inherit !important; /* kế thừa từ header */
 }
