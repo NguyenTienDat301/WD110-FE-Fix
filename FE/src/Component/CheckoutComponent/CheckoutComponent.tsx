@@ -140,7 +140,7 @@ const CheckoutComponent: React.FC = () => {
     try {
       const response = await api.get("/address");
       setIsAddress(response.data);
-      console.log('isAddress:', response.data);
+      console.log("isAddress:", response.data);
       return response.data;
     } catch (error) {
       console.log(error);
@@ -179,7 +179,6 @@ const CheckoutComponent: React.FC = () => {
       setShipAddress("");
     }
   };
-
 
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -317,7 +316,7 @@ const CheckoutComponent: React.FC = () => {
     } catch (error: any) {
       setPaymentLoading(false);
       setPaymentError(error?.data?.message || "Có lỗi xảy ra khi thanh toán");
-      
+
       const errorMessage = error?.data?.message;
       notification.error({
         message: "Lỗi khi thanh toán",
@@ -399,26 +398,28 @@ const CheckoutComponent: React.FC = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Hiển thị lỗi thanh toán */}
             {paymentError && (
               <div className="alert alert-danger" role="alert">
                 <strong>Lỗi thanh toán:</strong> {paymentError}
-                <button 
-                  type="button" 
-                  className="btn-close" 
+                <button
+                  type="button"
+                  className="btn-close"
                   onClick={() => setPaymentError(null)}
                 ></button>
               </div>
             )}
-            
+
             {/* Loading thanh toán */}
             {paymentLoading && (
               <div className="text-center my-4">
                 <div className="spinner-border text-primary" role="status">
                   <span className="visually-hidden">Đang xử lý...</span>
                 </div>
-                <p className="mt-2">Đang chuyển hướng đến trang thanh toán...</p>
+                <p className="mt-2">
+                  Đang chuyển hướng đến trang thanh toán...
+                </p>
               </div>
             )}
             <div className="box-table-cart box-form-checkout">
@@ -451,51 +452,51 @@ const CheckoutComponent: React.FC = () => {
                   )}
                   <div>
                     <div className="col-lg-6" style={{ width: "100%" }}>
-                        <div className="form-group">
-                          <label
-                            htmlFor=""
-                            style={{
-                              fontFamily: "Raleway",
-                              fontSize: "17px",
-                              fontWeight: "600",
-                              marginBottom: "10px",
-                            }}
-                          >
-                            *Họ tên người nhận
-                          </label>
-                          <input
-                            className="form-control name-pla"
-                            type="text"
-                            placeholder="*Nhập họ tên của người nhận"
-                            name="recipient_name"
-                            value={recipientName}
-                            onChange={(e) => setRecipientName(e.target.value)}
-                          />
-                        </div>
+                      <div className="form-group">
+                        <label
+                          htmlFor=""
+                          style={{
+                            fontFamily: "Raleway",
+                            fontSize: "17px",
+                            fontWeight: "600",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          *Họ tên người nhận
+                        </label>
+                        <input
+                          className="form-control name-pla"
+                          type="text"
+                          placeholder="*Nhập họ tên của người nhận"
+                          name="recipient_name"
+                          value={recipientName}
+                          onChange={(e) => setRecipientName(e.target.value)}
+                        />
                       </div>
-                      <div className="col-lg-6" style={{ width: "100%" }}>
-                        <div className="form-group">
-                          <label
-                            htmlFor=""
-                            style={{
-                              fontFamily: "Raleway",
-                              fontSize: "17px",
-                              fontWeight: "600",
-                              marginBottom: "10px",
-                            }}
-                          >
-                            *Họ tên người gửi
-                          </label>
-                          <input
-                            className="form-control name-pla"
-                            type="text"
-                            placeholder="*Nhập họ tên của người gửi"
-                            name="sender_name"
-                            value={senderName}
-                            onChange={(e) => setSenderName(e.target.value)}
-                          />
-                        </div>
+                    </div>
+                    <div className="col-lg-6" style={{ width: "100%" }}>
+                      <div className="form-group">
+                        <label
+                          htmlFor=""
+                          style={{
+                            fontFamily: "Raleway",
+                            fontSize: "17px",
+                            fontWeight: "600",
+                            marginBottom: "10px",
+                          }}
+                        >
+                          *Họ tên người gửi
+                        </label>
+                        <input
+                          className="form-control name-pla"
+                          type="text"
+                          placeholder="*Nhập họ tên của người gửi"
+                          name="sender_name"
+                          value={senderName}
+                          onChange={(e) => setSenderName(e.target.value)}
+                        />
                       </div>
+                    </div>
                     {/* <div className="col-lg-6" style={{ width: "100%" }}>
                       <div className="form-group">
                         <label
@@ -634,14 +635,37 @@ const CheckoutComponent: React.FC = () => {
                               />
                             </span>
                             <span className="title-item">
-                              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "4px",
+                                }}
+                              >
                                 <div>{item.product_name}</div>
-                                <div style={{ display: "flex", gap: "8px", fontSize: "12px", color: "#666" }}>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    gap: "8px",
+                                    fontSize: "12px",
+                                    color: "#666",
+                                  }}
+                                >
                                   {item.color && (
-                                    <span>Màu: <strong style={{ color: "#333" }}>{item.color}</strong></span>
+                                    <span>
+                                      Màu:{" "}
+                                      <strong style={{ color: "#333" }}>
+                                        {item.color}
+                                      </strong>
+                                    </span>
                                   )}
                                   {item.size && (
-                                    <span>Size: <strong style={{ color: "#333" }}>{item.size}</strong></span>
+                                    <span>
+                                      Size:{" "}
+                                      <strong style={{ color: "#333" }}>
+                                        {item.size}
+                                      </strong>
+                                    </span>
                                   )}
                                 </div>
                               </div>
@@ -705,7 +729,9 @@ const CheckoutComponent: React.FC = () => {
                         <div className="item-checkout justify-content-between">
                           <span className="font-sm">Mã giảm giá</span>
                           <span className="font-md-bold">
-                            {discount > 0 ? `-${formatCurrency(discount)}` : "0"}
+                            {discount > 0
+                              ? `-${formatCurrency(discount)}`
+                              : "0"}
                           </span>
                         </div>
                         <div className="item-checkout justify-content-between">
@@ -721,6 +747,11 @@ const CheckoutComponent: React.FC = () => {
                       <button
                         type="submit"
                         className="btn btn-brand-1-xl-bold w-100 font-md-bold"
+                        style={{
+                          backgroundColor: "#4da6ff",
+                          color: "white",
+                          border: "none",
+                        }}
                       >
                         Thanh toán
                       </button>
